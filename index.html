@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Ingeniería en Control de Procesos</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #1f2937;
+    }
+
+    header {
+      background: #123b5d;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 18px;
+    }
+
+    .contenedor {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    .buscador {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin-bottom: 25px;
+    }
+
+    .botones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    button {
+      padding: 18px;
+      border: none;
+      border-radius: 10px;
+      background: #1677b8;
+      color: white;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0d5d91;
+    }
+
+    .seccion {
+      background: white;
+      margin-top: 25px;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .seccion h2 {
+      margin-bottom: 15px;
+      color: #123b5d;
+    }
+
+    footer {
+      margin-top: 50px;
+      padding: 20px;
+      text-align: center;
+      background: #123b5d;
+      color: white;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Ingeniería en Control de Procesos</h1>
+    <p>Tu información está aquí</p>
+  </header>
+
+  <main class="contenedor">
+
+    <input
+      type="text"
+      class="buscador"
+      placeholder="Buscar materias, documentos o archivos..."
+    >
+
+    <div class="botones">
+      <button>Explorar Materias</button>
+      <button>Ver Malla Curricular</button>
+      <button>Anuncios</button>
+      <button>Información</button>
+    </div>
+
+    <section class="seccion">
+      <h2>Semestres</h2>
+
+      <div class="botones">
+        <button>Semestre 1</button>
+        <button>Semestre 2</button>
+        <button>Semestre 3</button>
+        <button>Semestre 4</button>
+        <button>Semestre 5</button>
+        <button>Semestre 6</button>
+        <button>Semestre 7</button>
+        <button>Semestre 8</button>
+        <button>Semestre 9</button>
+        <button>Semestre 10</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Ingeniería en Control de Procesos RCP
+  </footer>
+
+</body>
+</html>
