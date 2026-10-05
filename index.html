@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Ingeniería en Control de Procesos</title>
+  <title>Ingeniería en Control de Procesos RCP</title>
 
   <style>
     * {
@@ -22,17 +22,17 @@
     header {
       background: #123b5d;
       color: white;
-      padding: 30px 20px;
+      padding: 40px 20px;
       text-align: center;
     }
 
     header h1 {
-      font-size: 32px;
+      font-size: 34px;
       margin-bottom: 10px;
     }
 
     header p {
-      font-size: 18px;
+      font-size: 19px;
     }
 
     .contenedor {
@@ -43,16 +43,21 @@
 
     .buscador {
       width: 100%;
-      padding: 15px;
-      font-size: 16px;
+      padding: 16px;
+      font-size: 17px;
       border: 1px solid #ccc;
       border-radius: 10px;
       margin-bottom: 25px;
+      outline: none;
+    }
+
+    .buscador:focus {
+      border-color: #1677b8;
     }
 
     .botones {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 15px;
     }
 
@@ -64,10 +69,12 @@
       color: white;
       font-size: 17px;
       cursor: pointer;
+      transition: 0.2s;
     }
 
     button:hover {
       background: #0d5d91;
+      transform: translateY(-2px);
     }
 
     .seccion {
@@ -79,8 +86,32 @@
     }
 
     .seccion h2 {
-      margin-bottom: 15px;
       color: #123b5d;
+      margin-bottom: 18px;
+    }
+
+    .resultado {
+      display: none;
+      background: white;
+      margin-top: 25px;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .resultado h2 {
+      color: #123b5d;
+      margin-bottom: 10px;
+    }
+
+    .resultado p {
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    .cerrar {
+      margin-top: 20px;
+      background: #555;
     }
 
     footer {
@@ -92,8 +123,21 @@
     }
 
     @media (max-width: 600px) {
+
       header h1 {
-        font-size: 25px;
+        font-size: 26px;
+      }
+
+      header p {
+        font-size: 17px;
+      }
+
+      button {
+        font-size: 16px;
+      }
+
+      .contenedor {
+        padding: 15px;
       }
     }
   </style>
@@ -101,49 +145,239 @@
 
 <body>
 
+  <!-- ENCABEZADO -->
+
   <header>
     <h1>Ingeniería en Control de Procesos</h1>
     <p>Tu información está aquí</p>
   </header>
 
+
+  <!-- CONTENIDO PRINCIPAL -->
+
   <main class="contenedor">
+
+    <!-- BUSCADOR -->
 
     <input
       type="text"
+      id="buscador"
       class="buscador"
       placeholder="Buscar materias, documentos o archivos..."
+      onkeyup="buscar()"
     >
 
+
+    <!-- BOTONES PRINCIPALES -->
+
     <div class="botones">
-      <button>Explorar Materias</button>
-      <button>Ver Malla Curricular</button>
-      <button onclick="alert('Aquí aparecerán los anuncios de Ingeniería en Control de Procesos')">Anuncios</button>
-      <button>Información</button>
+
+      <button onclick="mostrarSeccion('materias')">
+        Explorar Materias
+      </button>
+
+      <button onclick="mostrarSeccion('malla')">
+        Ver Malla Curricular
+      </button>
+
+      <button onclick="mostrarSeccion('anuncios')">
+        Anuncios
+      </button>
+
+      <button onclick="mostrarSeccion('informacion')">
+        Información
+      </button>
+
     </div>
 
+
+    <!-- SEMESTRES -->
+
     <section class="seccion">
+
       <h2>Semestres</h2>
 
       <div class="botones">
-       
-        <button onclick="alert('Semestre 1')">Semestre 1</button>
-        <button>Semestre 2</button>
-        <button>Semestre 3</button>
-        <button>Semestre 4</button>
-        <button>Semestre 5</button>
-        <button>Semestre 6</button>
-        <button>Semestre 7</button>
-        <button>Semestre 8</button>
-        <button>Semestre 9</button>
-        <button>Semestre 10</button>
+
+        <button onclick="abrirSemestre(1)">
+          Semestre 1
+        </button>
+
+        <button onclick="abrirSemestre(2)">
+          Semestre 2
+        </button>
+
+        <button onclick="abrirSemestre(3)">
+          Semestre 3
+        </button>
+
+        <button onclick="abrirSemestre(4)">
+          Semestre 4
+        </button>
+
+        <button onclick="abrirSemestre(5)">
+          Semestre 5
+        </button>
+
+        <button onclick="abrirSemestre(6)">
+          Semestre 6
+        </button>
+
+        <button onclick="abrirSemestre(7)">
+          Semestre 7
+        </button>
+
+        <button onclick="abrirSemestre(8)">
+          Semestre 8
+        </button>
+
+        <button onclick="abrirSemestre(9)">
+          Semestre 9
+        </button>
+
+        <button onclick="abrirSemestre(10)">
+          Semestre 10
+        </button>
+
       </div>
+
+    </section>
+
+
+    <!-- RESULTADO -->
+
+    <section id="resultado" class="resultado">
+
+      <h2 id="tituloResultado"></h2>
+
+      <p id="textoResultado"></p>
+
+      <button class="cerrar" onclick="cerrarResultado()">
+        Cerrar
+      </button>
+
     </section>
 
   </main>
 
+
+  <!-- PIE DE PÁGINA -->
+
   <footer>
-    Ingeniería en Control de Procesos RCP
+    Ingeniería de Control de Procesos RCP
   </footer>
+
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+
+    function mostrarSeccion(seccion) {
+
+      const resultado = document.getElementById("resultado");
+      const titulo = document.getElementById("tituloResultado");
+      const texto = document.getElementById("textoResultado");
+
+      resultado.style.display = "block";
+
+      if (seccion === "materias") {
+
+        titulo.innerText = "Explorar Materias";
+
+        texto.innerText =
+          "Aquí aparecerán las materias organizadas por semestre.";
+
+      }
+
+      else if (seccion === "malla") {
+
+        titulo.innerText = "Malla Curricular";
+
+        texto.innerText =
+          "Aquí estará disponible la malla curricular de Ingeniería en Control de Procesos.";
+
+      }
+
+      else if (seccion === "anuncios") {
+
+        titulo.innerText = "Anuncios";
+
+        texto.innerText =
+          "Aquí aparecerán los anuncios importantes de la carrera.";
+
+      }
+
+      else if (seccion === "informacion") {
+
+        titulo.innerText = "Información";
+
+        texto.innerText =
+          "Información académica de Ingeniería en Control de Procesos RCP.";
+
+      }
+
+      resultado.scrollIntoView({
+        behavior: "smooth"
+      });
+    }
+
+
+    function abrirSemestre(numero) {
+
+      const resultado = document.getElementById("resultado");
+      const titulo = document.getElementById("tituloResultado");
+      const texto = document.getElementById("textoResultado");
+
+      resultado.style.display = "block";
+
+      titulo.innerText =
+        "Semestre " + numero;
+
+      texto.innerText =
+        "Aquí aparecerán las materias del Semestre " +
+        numero +
+        " y posteriormente sus documentos, tareas, prácticas y exámenes.";
+
+      resultado.scrollIntoView({
+        behavior: "smooth"
+      });
+    }
+
+
+    function cerrarResultado() {
+
+      document.getElementById("resultado").style.display = "none";
+
+    }
+
+
+    function buscar() {
+
+      const texto =
+        document.getElementById("buscador").value.toLowerCase();
+
+      const botones =
+        document.querySelectorAll("button");
+
+      botones.forEach(function(boton) {
+
+        if (boton.innerText.toLowerCase().includes(texto)) {
+
+          boton.style.display = "";
+
+        } else {
+
+          boton.style.display = "none";
+
+        }
+
+      });
+
+    }
+
+  </script>
 
 </body>
 </html>
+    
+     
