@@ -3,381 +3,358 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Ingeniería en Control de Procesos RCP</title>
-
+  <title>RCP - Reacciona Control de Procesos</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#123b8f">
+  <link rel="apple-touch-icon" href="logo.png">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    :root {
+      --rojo: #d71920;
+      --rojo-oscuro: #a30f15;
+      --azul: #123b8f;
+      --azul-oscuro: #0b2559;
+      --fondo: #f3f5f9;
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: var(--fondo); color: #1f2937; }
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      color: #1f2937;
-    }
+    /* ENCABEZADO */
+    header { background: linear-gradient(135deg, var(--azul-oscuro), var(--azul)); color: white; border-bottom: 5px solid var(--rojo); position: sticky; top: 0; z-index: 50; }
+    .barra { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 14px; padding: 12px 18px; }
+    .hamburguesa { background: transparent; border: none; cursor: pointer; padding: 8px; display: flex; flex-direction: column; gap: 5px; }
+    .hamburguesa span { display: block; width: 28px; height: 3px; background: white; border-radius: 2px; }
+    .hamburguesa:hover span { background: #ffd0d2; }
+    .marca { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+    #logo { height: 64px; width: auto; display: block; }
+    .logo-texto { width: 64px; height: 64px; border-radius: 50%; background: var(--rojo); border: 3px solid white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; letter-spacing: 1px; }
+    .marca h1 { font-size: 24px; line-height: 1.1; }
+    .marca p { font-size: 14px; opacity: 0.9; margin-top: 3px; }
 
-    header {
-      background: #123b5d;
-      color: white;
-      padding: 40px 20px;
-      text-align: center;
-    }
+    /* MENU LATERAL */
+    #fondoMenu { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 80; }
+    #fondoMenu.abierto { display: block; }
+    #menu { position: fixed; top: 0; left: 0; bottom: 0; width: 290px; max-width: 85%; background: white; z-index: 90; transform: translateX(-100%); transition: transform 0.25s; display: flex; flex-direction: column; box-shadow: 4px 0 18px rgba(0,0,0,0.25); }
+    #menu.abierto { transform: translateX(0); }
+    .menu-cab { background: var(--azul); color: white; padding: 20px; font-size: 18px; font-weight: bold; border-bottom: 4px solid var(--rojo); display: flex; justify-content: space-between; align-items: center; }
+    .menu-cab button { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
+    .menu-lista { padding: 12px; overflow-y: auto; }
+    .menu-item { display: block; width: 100%; text-align: left; padding: 15px 16px; margin-bottom: 8px; border: none; border-radius: 10px; background: #eef1f8; color: var(--azul-oscuro); font-size: 16px; cursor: pointer; }
+    .menu-item:hover { background: var(--rojo); color: white; }
 
-    header h1 {
-      font-size: 34px;
-      margin-bottom: 10px;
-    }
+    /* CONTENIDO */
+    .contenedor { max-width: 1100px; margin: 25px auto; padding: 0 18px; }
+    .buscador { width: 100%; padding: 15px; font-size: 17px; border: 2px solid #d5d9e4; border-radius: 10px; margin-bottom: 20px; outline: none; }
+    .buscador:focus { border-color: var(--azul); }
+    .volver { margin-bottom: 14px; padding: 10px 18px; border: none; border-radius: 8px; background: var(--rojo); color: white; font-size: 15px; cursor: pointer; }
+    .volver:hover { background: var(--rojo-oscuro); }
+    .ruta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 15px; font-size: 15px; }
+    .ruta a { color: var(--azul); cursor: pointer; }
+    .ruta a:hover { text-decoration: underline; }
+    .ruta span { color: #6b7280; }
+    .seccion { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-top: 4px solid var(--azul); }
+    .seccion h2 { color: var(--azul-oscuro); margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 15px; }
+    .carpeta { padding: 20px; border: none; border-radius: 10px; background: var(--azul); color: white; font-size: 18px; cursor: pointer; transition: 0.2s; }
+    .carpeta:hover { background: var(--rojo); transform: translateY(-2px); }
+    .archivo { display: block; padding: 16px; border-radius: 10px; background: #eef1f8; color: var(--azul-oscuro); text-decoration: none; font-size: 16px; border: 1px solid #d5d9e4; word-break: break-word; }
+    .archivo:hover { background: #fde4e5; border-color: var(--rojo); }
+    h3 { color: var(--azul-oscuro); margin: 25px 0 12px; font-size: 18px; }
+    .msg { color: #6b7280; padding: 10px 0; }
+    .error { color: #b91c1c; }
 
-    header p {
-      font-size: 19px;
-    }
+    /* VISOR */
+    #visor { display: none; position: fixed; inset: 0; z-index: 100; background: #111; flex-direction: column; }
+    #visor.abierto { display: flex; }
+    .visor-barra { display: flex; align-items: center; gap: 12px; padding: 10px 15px; background: var(--azul); border-bottom: 3px solid var(--rojo); color: white; }
+    .visor-barra button { padding: 10px 18px; border: none; border-radius: 8px; background: var(--rojo); color: white; font-size: 16px; cursor: pointer; }
+    .visor-barra button:hover { background: var(--rojo-oscuro); }
+    .visor-barra .nombre { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+    .visor-barra a { color: white; font-size: 14px; white-space: nowrap; }
+    #visorFrame { flex: 1; width: 100%; border: none; background: white; }
 
-    .contenedor {
-      max-width: 1100px;
-      margin: 30px auto;
-      padding: 20px;
-    }
-
-    .buscador {
-      width: 100%;
-      padding: 16px;
-      font-size: 17px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      margin-bottom: 25px;
-      outline: none;
-    }
-
-    .buscador:focus {
-      border-color: #1677b8;
-    }
-
-    .botones {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 15px;
-    }
-
-    button {
-      padding: 18px;
-      border: none;
-      border-radius: 10px;
-      background: #1677b8;
-      color: white;
-      font-size: 17px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background: #0d5d91;
-      transform: translateY(-2px);
-    }
-
-    .seccion {
-      background: white;
-      margin-top: 25px;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .seccion h2 {
-      color: #123b5d;
-      margin-bottom: 18px;
-    }
-
-    .resultado {
-      display: none;
-      background: white;
-      margin-top: 25px;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .resultado h2 {
-      color: #123b5d;
-      margin-bottom: 10px;
-    }
-
-    .resultado p {
-      margin-top: 10px;
-      line-height: 1.6;
-    }
-
-    .cerrar {
-      margin-top: 20px;
-      background: #555;
-    }
-
-    footer {
-      margin-top: 50px;
-      padding: 20px;
-      text-align: center;
-      background: #123b5d;
-      color: white;
-    }
+    footer { margin-top: 50px; padding: 22px; text-align: center; background: var(--azul-oscuro); color: white; border-top: 5px solid var(--rojo); }
 
     @media (max-width: 600px) {
-
-      header h1 {
-        font-size: 26px;
-      }
-
-      header p {
-        font-size: 17px;
-      }
-
-      button {
-        font-size: 16px;
-      }
-
-      .contenedor {
-        padding: 15px;
-      }
+      #logo, .logo-texto { height: 50px; width: 50px; }
+      #logo { width: auto; }
+      .marca h1 { font-size: 18px; }
+      .marca p { font-size: 12px; }
     }
   </style>
 </head>
-
 <body>
 
-  <!-- ENCABEZADO -->
-
   <header>
-    <h1>Ingeniería en Control de Procesos</h1>
-    <p>Tu información está aquí</p>
+    <div class="barra">
+      <button class="hamburguesa" onclick="abrirMenu()" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="marca" onclick="irInicio()">
+        <img id="logo" src="logo.png" alt="Logo RCP"
+             onerror="this.style.display='none';document.getElementById('logoTexto').style.display='flex';">
+        <div id="logoTexto" class="logo-texto">RCP</div>
+        <div>
+          <h1>RCP</h1>
+          <p>Reacciona Control de Procesos</p>
+        </div>
+      </div>
+    </div>
   </header>
 
+  <div id="sinRed" style="display:none;background:#fff3cd;color:#664d03;text-align:center;padding:8px 12px;font-size:14px;">
+    Sin conexión: se muestran las carpetas que ya abriste antes. Los archivos necesitan internet.
+  </div>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <div id="fondoMenu" onclick="cerrarMenu()"></div>
+  <nav id="menu">
+    <div class="menu-cab">
+      <span>Menú</span>
+      <button onclick="cerrarMenu()" aria-label="Cerrar menú">×</button>
+    </div>
+    <div class="menu-lista" id="menuLista"></div>
+  </nav>
 
   <main class="contenedor">
-
-    <!-- BUSCADOR -->
-
-    <input
-      type="text"
-      id="buscador"
-      class="buscador"
-      placeholder="Buscar materias, documentos o archivos..."
-      onkeyup="buscar()"
-    >
-
-
-    <!-- BOTONES PRINCIPALES -->
-
-    <div class="botones">
-
-      <button onclick="mostrarSeccion('materias')">
-        Explorar Materias
-      </button>
-
-      <button onclick="mostrarSeccion('malla')">
-        Ver Malla Curricular
-      </button>
-
-      <button onclick="mostrarSeccion('anuncios')">
-        Anuncios
-      </button>
-
-      <button onclick="mostrarSeccion('informacion')">
-        Información
-      </button>
-
-    </div>
-
-
-    <!-- SEMESTRES -->
-
+    <input type="text" id="buscador" class="buscador" placeholder="Buscar en esta carpeta..." oninput="filtrar()">
+    <button id="btnVolver" class="volver" style="display:none" onclick="volver()">← Volver</button>
+    <div id="ruta" class="ruta"></div>
     <section class="seccion">
-
-      <h2>Semestres</h2>
-
-      <div class="botones">
-
-        <button onclick="abrirSemestre(1)">
-          Semestre 1
-        </button>
-
-        <button onclick="abrirSemestre(2)">
-          Semestre 2
-        </button>
-
-        <button onclick="abrirSemestre(3)">
-          Semestre 3
-        </button>
-
-        <button onclick="abrirSemestre(4)">
-          Semestre 4
-        </button>
-
-        <button onclick="abrirSemestre(5)">
-          Semestre 5
-        </button>
-
-        <button onclick="abrirSemestre(6)">
-          Semestre 6
-        </button>
-
-        <button onclick="abrirSemestre(7)">
-          Semestre 7
-        </button>
-
-        <button onclick="abrirSemestre(8)">
-          Semestre 8
-        </button>
-
-        <button onclick="abrirSemestre(9)">
-          Semestre 9
-        </button>
-
-        <button onclick="abrirSemestre(10)">
-          Semestre 10
-        </button>
-
-      </div>
-
+      <h2 id="titulo">Cargando...</h2>
+      <div id="contenido"></div>
     </section>
-
-
-    <!-- RESULTADO -->
-
-    <section id="resultado" class="resultado">
-
-      <h2 id="tituloResultado"></h2>
-
-      <p id="textoResultado"></p>
-
-      <button class="cerrar" onclick="cerrarResultado()">
-        Cerrar
-      </button>
-
-    </section>
-
   </main>
 
+  <div id="visor">
+    <div class="visor-barra">
+      <button onclick="cerrarVisor()">← Volver</button>
+      <span class="nombre" id="visorNombre"></span>
+      <a id="visorLink" href="#" target="_blank" rel="noopener">Abrir en Drive</a>
+    </div>
+    <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
+  </div>
 
-  <!-- PIE DE PÁGINA -->
-
-  <footer>
-    Ingeniería de Control de Procesos RCP
-  </footer>
-
-
-  <!-- JAVASCRIPT -->
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos</footer>
 
   <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxjXKfUxqh9Q_i-7VZGsBc_dr57CUUH2kGXJZEfug74K5VWHqpi7znTy-jHdy5gSdbjhQ/exec";
 
-    function mostrarSeccion(seccion) {
+    const cache = {};
+    let raiz = null;      // datos de la carpeta raíz
+    let camino = [];      // [{id, name}]
+    let actual = null;    // carpeta abierta
+    let enInicio = true;  // true = pantalla principal (solo semestres)
 
-      const resultado = document.getElementById("resultado");
-      const titulo = document.getElementById("tituloResultado");
-      const texto = document.getElementById("textoResultado");
+    const esSemestre = (n) => /^semestre/i.test(n.trim());
 
-      resultado.style.display = "block";
-
-      if (seccion === "materias") {
-
-        titulo.innerText = "Explorar Materias";
-
-        texto.innerText =
-          "Aquí aparecerán las materias organizadas por semestre.";
-
-      }
-
-      else if (seccion === "malla") {
-
-        titulo.innerText = "Malla Curricular";
-
-        texto.innerText =
-          "Aquí estará disponible la malla curricular de Ingeniería en Control de Procesos.";
-
-      }
-
-      else if (seccion === "anuncios") {
-
-        titulo.innerText = "Anuncios";
-
-        texto.innerText =
-          "Aquí aparecerán los anuncios importantes de la carrera.";
-
-      }
-
-      else if (seccion === "informacion") {
-
-        titulo.innerText = "Información";
-
-        texto.innerText =
-          "Información académica de Ingeniería en Control de Procesos RCP.";
-
-      }
-
-      resultado.scrollIntoView({
-        behavior: "smooth"
-      });
-    }
-
-
-    function abrirSemestre(numero) {
-
-      const resultado = document.getElementById("resultado");
-      const titulo = document.getElementById("tituloResultado");
-      const texto = document.getElementById("textoResultado");
-
-      resultado.style.display = "block";
-
-      titulo.innerText =
-        "Semestre " + numero;
-
-      texto.innerText =
-        "Aquí aparecerán las materias del Semestre " +
-        numero +
-        " y posteriormente sus documentos, tareas, prácticas y exámenes.";
-
-      resultado.scrollIntoView({
-        behavior: "smooth"
-      });
-    }
-
-
-    function cerrarResultado() {
-
-      document.getElementById("resultado").style.display = "none";
-
-    }
-
-
-    function buscar() {
-
-      const texto =
-        document.getElementById("buscador").value.toLowerCase();
-
-      const botones =
-        document.querySelectorAll("button");
-
-      botones.forEach(function(boton) {
-
-        if (boton.innerText.toLowerCase().includes(texto)) {
-
-          boton.style.display = "";
-
-        } else {
-
-          boton.style.display = "none";
-
+    async function cargar(id) {
+      const clave = id || "root";
+      if (cache[clave]) return cache[clave];
+      const url = id ? API_URL + "?id=" + encodeURIComponent(id) : API_URL;
+      try {
+        const r = await fetch(url);
+        const d = await r.json();
+        if (!d.ok) throw new Error(d.error);
+        cache[clave] = d;
+        try { localStorage.setItem("rcp_" + clave, JSON.stringify(d)); } catch (e) {}
+        return d;
+      } catch (e) {
+        // Sin internet: usar la última copia guardada de esta carpeta
+        let guardado = null;
+        try { guardado = localStorage.getItem("rcp_" + clave); } catch (e2) {}
+        if (guardado) {
+          const d = JSON.parse(guardado);
+          cache[clave] = d;
+          return d;
         }
-
-      });
-
+        throw new Error("sin conexión y esta carpeta aún no se ha abierto antes");
+      }
     }
 
+    function mostrarError(e) {
+      document.getElementById("contenido").innerHTML =
+        '<p class="msg error">No se pudo cargar: ' + e.message + '</p>';
+    }
+
+    /* PANTALLA PRINCIPAL: solo semestres; el resto va al menú */
+    async function irInicio() {
+      cerrarMenu();
+      document.getElementById("buscador").value = "";
+      document.getElementById("contenido").innerHTML = '<p class="msg">Cargando...</p>';
+      try {
+        raiz = await cargar(null);
+        camino = [{ id: raiz.id, name: raiz.name }];
+        enInicio = true;
+        actual = {
+          id: raiz.id,
+          name: "Semestres",
+          folders: raiz.folders.filter(f => esSemestre(f.name)),
+          files: []
+        };
+        dibujar(actual);
+        armarMenu();
+      } catch (e) { mostrarError(e); }
+    }
+
+    function armarMenu() {
+      const lista = document.getElementById("menuLista");
+      lista.innerHTML = "";
+      const inicio = document.createElement("button");
+      inicio.className = "menu-item";
+      inicio.textContent = "🏠 Inicio";
+      inicio.onclick = irInicio;
+      lista.appendChild(inicio);
+
+      raiz.folders.filter(f => !esSemestre(f.name)).forEach(f => {
+        const b = document.createElement("button");
+        b.className = "menu-item";
+        b.textContent = f.name.trim();
+        b.onclick = () => { cerrarMenu(); camino = [{ id: raiz.id, name: raiz.name }]; abrir(f.id, f.name); };
+        lista.appendChild(b);
+      });
+
+      raiz.files.forEach(a => {
+        const b = document.createElement("button");
+        b.className = "menu-item";
+        b.textContent = "📄 " + a.name;
+        b.onclick = () => { cerrarMenu(); abrirVisor(a); };
+        lista.appendChild(b);
+      });
+    }
+
+    async function abrir(id, nombre, nivel) {
+      const cont = document.getElementById("contenido");
+      document.getElementById("buscador").value = "";
+      cont.innerHTML = '<p class="msg">Cargando...</p>';
+      try {
+        const d = await cargar(id);
+        if (nivel === undefined) camino.push({ id: d.id, name: d.name });
+        else camino = camino.slice(0, nivel + 1);
+        enInicio = false;
+        actual = d;
+        dibujar(d);
+      } catch (e) { mostrarError(e); }
+    }
+
+    function dibujar(d, filtro) {
+      const f = (filtro || "").toLowerCase();
+      const carpetas = d.folders.filter(x => x.name.toLowerCase().includes(f));
+      const archivos = d.files.filter(x => x.name.toLowerCase().includes(f));
+
+      document.getElementById("titulo").innerText = d.name.trim();
+      document.getElementById("btnVolver").style.display = enInicio ? "none" : "inline-block";
+
+      const ruta = document.getElementById("ruta");
+      ruta.innerHTML = "";
+      if (!enInicio) {
+        camino.forEach((p, i) => {
+          if (i > 0) ruta.insertAdjacentHTML("beforeend", "<span>›</span>");
+          const a = document.createElement("a");
+          a.textContent = i === 0 ? "Inicio" : p.name.trim();
+          a.onclick = i === 0 ? irInicio : () => abrir(p.id, p.name, i);
+          ruta.appendChild(a);
+        });
+      }
+
+      const cont = document.getElementById("contenido");
+      cont.innerHTML = "";
+
+      if (carpetas.length) {
+        const g = document.createElement("div");
+        g.className = "grid";
+        carpetas.forEach(c => {
+          const b = document.createElement("button");
+          b.className = "carpeta";
+          b.textContent = c.name.trim();
+          b.onclick = () => {
+            if (enInicio) camino = [{ id: raiz.id, name: raiz.name }];
+            abrir(c.id, c.name);
+          };
+          g.appendChild(b);
+        });
+        cont.appendChild(g);
+      }
+
+      if (archivos.length) {
+        const t = document.createElement("h3");
+        t.textContent = "Archivos";
+        cont.appendChild(t);
+        const g = document.createElement("div");
+        g.className = "grid";
+        archivos.forEach(a => {
+          const l = document.createElement("a");
+          l.className = "archivo";
+          l.href = a.url;
+          l.target = "_blank";
+          l.rel = "noopener";
+          l.onclick = (ev) => { ev.preventDefault(); abrirVisor(a); };
+          l.textContent = "📄 " + a.name;
+          g.appendChild(l);
+        });
+        cont.appendChild(g);
+      }
+
+      if (!carpetas.length && !archivos.length) {
+        cont.innerHTML = '<p class="msg">' + (f ? "Sin resultados." : "Esta carpeta está vacía.") + "</p>";
+      }
+    }
+
+    function volver() {
+      if (camino.length > 2) {
+        const anterior = camino[camino.length - 2];
+        abrir(anterior.id, anterior.name, camino.length - 2);
+      } else {
+        irInicio();
+      }
+    }
+
+    function filtrar() {
+      if (actual) dibujar(actual, document.getElementById("buscador").value);
+    }
+
+    /* MENU */
+    function abrirMenu() {
+      document.getElementById("menu").classList.add("abierto");
+      document.getElementById("fondoMenu").classList.add("abierto");
+    }
+    function cerrarMenu() {
+      document.getElementById("menu").classList.remove("abierto");
+      document.getElementById("fondoMenu").classList.remove("abierto");
+    }
+
+    /* VISOR */
+    function abrirVisor(a) {
+      if (!navigator.onLine) {
+        alert("Sin internet: los archivos se abren solo con conexión.");
+        return;
+      }
+      document.getElementById("visorNombre").textContent = a.name;
+      document.getElementById("visorLink").href = a.url;
+      document.getElementById("visorFrame").src = "https://drive.google.com/file/d/" + a.id + "/preview";
+      document.getElementById("visor").classList.add("abierto");
+      document.body.style.overflow = "hidden";
+    }
+    function cerrarVisor() {
+      document.getElementById("visor").classList.remove("abierto");
+      document.getElementById("visorFrame").src = "about:blank";
+      document.body.style.overflow = "";
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { cerrarVisor(); cerrarMenu(); }
+    });
+
+    function estadoRed() {
+      document.getElementById("sinRed").style.display = navigator.onLine ? "none" : "block";
+    }
+    window.addEventListener("online", estadoRed);
+    window.addEventListener("offline", estadoRed);
+    estadoRed();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+    }
+
+    irInicio();
   </script>
 
 </body>
 </html>
-    
-     
