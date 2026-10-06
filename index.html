@@ -219,6 +219,15 @@
         b.onclick = () => { cerrarMenu(); abrirVisor(a); };
         lista.appendChild(b);
       });
+
+      const perfil = document.createElement("button");
+      perfil.className = "menu-item";
+      perfil.textContent = "🎓 Perfil UAGRM";
+      perfil.onclick = () => {
+        cerrarMenu();
+        window.open("https://perfil.uagrm.edu.bo/estudiantes/default.php", "_blank", "noopener");
+      };
+      lista.appendChild(perfil);
     }
 
     async function abrir(id, nombre, nivel) {
