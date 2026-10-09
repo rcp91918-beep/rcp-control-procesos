@@ -38,8 +38,13 @@
     .menu-cab { background: var(--azul); color: white; padding: 20px; font-size: 18px; font-weight: bold; border-bottom: 4px solid var(--rojo); display: flex; justify-content: space-between; align-items: center; }
     .menu-cab button { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
     .menu-lista { padding: 12px; overflow-y: auto; }
-    .menu-item { display: block; width: 100%; text-align: left; padding: 15px 16px; margin-bottom: 8px; border: none; border-radius: 10px; background: #eef1f8; color: var(--azul-oscuro); font-size: 16px; cursor: pointer; }
+    .menu-item { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 15px 16px; margin-bottom: 8px; border: none; border-radius: 10px; background: #eef1f8; color: var(--azul-oscuro); font-size: 16px; cursor: pointer; }
     .menu-item:hover { background: var(--rojo); color: white; }
+
+    /* AVISO DE NOVEDAD */
+    .nuevo { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 8px; margin-left: 10px; border-radius: 12px; background: #16a34a; color: white; font-size: 13px; font-weight: bold; flex-shrink: 0; }
+    .hamburguesa { position: relative; }
+    #puntoNuevo { display: none; position: absolute; top: 2px; right: 2px; width: 13px; height: 13px; border-radius: 50%; background: #22c55e; border: 2px solid white; }
 
     /* CONTENIDO */
     .contenedor { max-width: 1100px; margin: 25px auto; padding: 0 18px; }
@@ -87,7 +92,7 @@
   <header>
     <div class="barra">
       <button class="hamburguesa" onclick="abrirMenu()" aria-label="Abrir menú">
-        <span></span><span></span><span></span>
+        <span></span><span></span><span></span><i id="puntoNuevo"></i>
       </button>
       <div class="marca" onclick="irInicio()">
         <img id="logo" src="logo.png" alt="Logo RCP"
@@ -146,6 +151,26 @@
 
     const esSemestre = (n) => /^semestre/i.test(n.trim());
 
+    /* NOVEDADES: se compara la última modificación en Drive con lo que el usuario ya vio */
+    const VISTO_KEY = "rcp_visto";
+    let umbralNuevo = null; // fecha a partir de la cual un archivo cuenta como nuevo
+    function leerVisto() {
+      try { return JSON.parse(localStorage.getItem(VISTO_KEY)) || {}; } catch (e) { return {}; }
+    }
+    function marcarVisto(id, t) {
+      const v = leerVisto();
+      v[id] = t;
+      try { localStorage.setItem(VISTO_KEY, JSON.stringify(v)); } catch (e) {}
+    }
+    const fechaCarpeta = (f) => f.latest || f.updated || 0;
+    const esNuevo = (f) => fechaCarpeta(f) > (leerVisto()[f.id] || 0);
+    function crearBadge(t) {
+      const s = document.createElement("span");
+      s.className = "nuevo";
+      s.textContent = t;
+      return s;
+    }
+
     async function cargar(id) {
       const clave = id || "root";
       if (cache[clave]) return cache[clave];
@@ -182,6 +207,7 @@
       document.getElementById("contenido").innerHTML = '<p class="msg">Cargando...</p>';
       try {
         raiz = await cargar(null);
+        umbralNuevo = null;
         camino = [{ id: raiz.id, name: raiz.name }];
         enInicio = true;
         actual = {
@@ -204,13 +230,27 @@
       inicio.onclick = irInicio;
       lista.appendChild(inicio);
 
+      let hayNuevo = false;
       raiz.folders.filter(f => !esSemestre(f.name)).forEach(f => {
         const b = document.createElement("button");
         b.className = "menu-item";
         b.textContent = f.name.trim();
-        b.onclick = () => { cerrarMenu(); camino = [{ id: raiz.id, name: raiz.name }]; abrir(f.id, f.name); };
+        if (esNuevo(f)) {
+          hayNuevo = true;
+          b.appendChild(crearBadge("✓"));
+        }
+        b.onclick = () => {
+          cerrarMenu();
+          const previo = leerVisto()[f.id];
+          umbralNuevo = previo === undefined ? null : previo;
+          marcarVisto(f.id, fechaCarpeta(f));
+          camino = [{ id: raiz.id, name: raiz.name }];
+          abrir(f.id, f.name);
+          armarMenu();
+        };
         lista.appendChild(b);
       });
+      document.getElementById("puntoNuevo").style.display = hayNuevo ? "block" : "none";
 
       raiz.files.forEach(a => {
         const b = document.createElement("button");
@@ -283,6 +323,7 @@
           const b = document.createElement("button");
           b.className = "carpeta";
           b.textContent = c.name.trim();
+          if (!enInicio && umbralNuevo !== null && (c.updated || 0) > umbralNuevo) b.appendChild(crearBadge("✓ Nuevo"));
           b.onclick = () => {
             if (enInicio) camino = [{ id: raiz.id, name: raiz.name }];
             abrir(c.id, c.name);
@@ -306,6 +347,7 @@
           l.rel = "noopener";
           l.onclick = (ev) => { ev.preventDefault(); abrirVisor(a); };
           l.textContent = "📄 " + a.name;
+          if (umbralNuevo !== null && (a.updated || 0) > umbralNuevo) l.appendChild(crearBadge("✓ Nuevo"));
           g.appendChild(l);
         });
         cont.appendChild(g);
