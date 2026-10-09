@@ -140,7 +140,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v7</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v8</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwG5PAQKNt0-RLGs7Ij8VVh9pe_CAgUrGBgKgEccC1jSYN_hM_vTP7Xqg2OKCBdyP22Vw/exec";
@@ -207,7 +207,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v7\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v8\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -222,7 +222,9 @@
     /* HISTORIAL: el botón o gesto "Atrás" del celular sube un nivel */
     let restaurando = false;
     let primeraVista = true;
-    function vistaActual() { return { v: enInicio ? "i" : "c", camino: camino.slice() }; }
+    let origenMenu = false;  // true si la carpeta se abrió desde el menú de las tres rayitas
+    let vistaPrevia = null;  // dónde estaba la persona antes de abrir esa carpeta del menú
+    function vistaActual() { return { v: enInicio ? "i" : "c", camino: camino.slice(), m: origenMenu }; }
     function registrarVista() {
       if (restaurando) return;
       const est = vistaActual();
@@ -244,6 +246,7 @@
       try {
         raiz = await cargar(null);
         umbralNuevo = null;
+        origenMenu = false;
         camino = [{ id: raiz.id, name: raiz.name }];
         enInicio = true;
         actual = {
@@ -281,6 +284,8 @@
           const previo = leerVisto()[f.id];
           umbralNuevo = previo !== undefined ? previo : null;
           marcarVisto(f.id, fechaCarpeta(f));
+          if (!origenMenu) vistaPrevia = vistaActual();
+          origenMenu = true;
           camino = [{ id: raiz.id, name: raiz.name }];
           abrir(f.id, f.name);
           armarMenu();
@@ -364,7 +369,10 @@
           b.textContent = c.name.trim();
           if (!enInicio && umbralNuevo !== null && (c.updated || 0) > umbralNuevo) b.appendChild(crearBadge("✓ Nuevo"));
           b.onclick = () => {
-            if (enInicio) camino = [{ id: raiz.id, name: raiz.name }];
+            if (enInicio) {
+              camino = [{ id: raiz.id, name: raiz.name }];
+              origenMenu = false;
+            }
             abrir(c.id, c.name);
           };
           g.appendChild(b);
@@ -401,9 +409,26 @@
       if (camino.length > 2) {
         const anterior = camino[camino.length - 2];
         abrir(anterior.id, anterior.name, camino.length - 2);
+      } else if (origenMenu) {
+        volverAlMenu();
       } else {
         irInicio();
       }
+    }
+
+    /* Al salir de una carpeta del menú: volver a donde estaba y reabrir el menú */
+    async function volverAlMenu() {
+      const prev = vistaPrevia;
+      origenMenu = false;
+      vistaPrevia = null;
+      if (prev && prev.v === "c") {
+        camino = prev.camino.slice();
+        const u = camino[camino.length - 1];
+        await abrir(u.id, u.name, camino.length - 1);
+      } else {
+        await irInicio();
+      }
+      abrirMenu();
     }
 
     function filtrar() {
@@ -472,6 +497,7 @@
       if (!s || !s.v) return;
       const mismo = s.v === (enInicio ? "i" : "c") && JSON.stringify(s.camino) === JSON.stringify(camino);
       if (mismo) return;
+      const veniaDeMenu = origenMenu && !enInicio && camino.length === 2;
       restaurando = true;
       try {
         if (s.v === "i") await irInicio();
@@ -480,7 +506,9 @@
           const ult = camino[camino.length - 1];
           await abrir(ult.id, ult.name, camino.length - 1);
         }
+        origenMenu = !!s.m;
       } finally { restaurando = false; }
+      if (veniaDeMenu && !s.m) abrirMenu();
     });
 
     irInicio();
