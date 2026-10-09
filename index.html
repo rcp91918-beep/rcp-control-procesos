@@ -140,7 +140,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v6</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v7</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwG5PAQKNt0-RLGs7Ij8VVh9pe_CAgUrGBgKgEccC1jSYN_hM_vTP7Xqg2OKCBdyP22Vw/exec";
@@ -207,7 +207,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v6\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v7\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -217,6 +217,23 @@
     function mostrarError(e) {
       document.getElementById("contenido").innerHTML =
         '<p class="msg error">No se pudo cargar: ' + e.message + '</p>';
+    }
+
+    /* HISTORIAL: el botón o gesto "Atrás" del celular sube un nivel */
+    let restaurando = false;
+    let primeraVista = true;
+    function vistaActual() { return { v: enInicio ? "i" : "c", camino: camino.slice() }; }
+    function registrarVista() {
+      if (restaurando) return;
+      const est = vistaActual();
+      if (primeraVista) {
+        primeraVista = false;
+        try { history.replaceState(est, ""); } catch (e) {}
+        return;
+      }
+      const prev = history.state;
+      if (prev && prev.v === est.v && JSON.stringify(prev.camino) === JSON.stringify(est.camino)) return;
+      try { history.pushState(est, ""); } catch (e) {}
     }
 
     /* PANTALLA PRINCIPAL: solo semestres; el resto va al menú */
@@ -237,6 +254,7 @@
         };
         dibujar(actual);
         armarMenu();
+        registrarVista();
       } catch (e) { mostrarError(e); }
     }
 
@@ -310,6 +328,7 @@
         enInicio = false;
         actual = d;
         dibujar(d);
+        registrarVista();
       } catch (e) { mostrarError(e); }
     }
 
@@ -409,14 +428,27 @@
       }
       document.getElementById("visorNombre").textContent = a.name;
       document.getElementById("visorLink").href = a.url;
-      document.getElementById("visorFrame").src = "https://drive.google.com/file/d/" + a.id + "/preview";
+      /* se crea un visor nuevo cada vez: así no ensucia el historial del navegador */
+      const nuevoFrame = document.createElement("iframe");
+      nuevoFrame.id = "visorFrame";
+      nuevoFrame.setAttribute("allow", "autoplay");
+      nuevoFrame.setAttribute("allowfullscreen", "");
+      nuevoFrame.src = "https://drive.google.com/file/d/" + a.id + "/preview";
+      document.getElementById("visorFrame").replaceWith(nuevoFrame);
       document.getElementById("visor").classList.add("abierto");
       document.body.style.overflow = "hidden";
+      try { history.pushState(Object.assign({ visor: true }, vistaActual()), ""); } catch (e) {}
+    }
+    function cerrarVisorInterno() {
+      document.getElementById("visor").classList.remove("abierto");
+      const vacio = document.createElement("iframe");
+      vacio.id = "visorFrame";
+      document.getElementById("visorFrame").replaceWith(vacio);
+      document.body.style.overflow = "";
     }
     function cerrarVisor() {
-      document.getElementById("visor").classList.remove("abierto");
-      document.getElementById("visorFrame").src = "about:blank";
-      document.body.style.overflow = "";
+      if (history.state && history.state.visor) { history.back(); return; }
+      cerrarVisorInterno();
     }
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") { cerrarVisor(); cerrarMenu(); }
@@ -432,6 +464,24 @@
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
     }
+
+    window.addEventListener("popstate", async (ev) => {
+      cerrarMenu();
+      cerrarVisorInterno();
+      const s = ev.state;
+      if (!s || !s.v) return;
+      const mismo = s.v === (enInicio ? "i" : "c") && JSON.stringify(s.camino) === JSON.stringify(camino);
+      if (mismo) return;
+      restaurando = true;
+      try {
+        if (s.v === "i") await irInicio();
+        else {
+          camino = s.camino.slice();
+          const ult = camino[camino.length - 1];
+          await abrir(ult.id, ult.name, camino.length - 1);
+        }
+      } finally { restaurando = false; }
+    });
 
     irInicio();
   </script>
