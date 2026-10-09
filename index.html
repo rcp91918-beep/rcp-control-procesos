@@ -140,7 +140,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos</footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v3</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxjXKfUxqh9Q_i-7VZGsBc_dr57CUUH2kGXJZEfug74K5VWHqpi7znTy-jHdy5gSdbjhQ/exec";
@@ -195,6 +195,23 @@
         }
         throw new Error("sin conexión y esta carpeta aún no se ha abierto antes");
       }
+    }
+
+    /* DIAGNÓSTICO: abrir la página con ?debug al final de la dirección */
+    function mostrarDebug() {
+      const av = raiz.folders.find(f => /^avisos/i.test(f.name.trim()));
+      let box = document.getElementById("debugBox");
+      if (!box) {
+        box = document.createElement("pre");
+        box.id = "debugBox";
+        box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
+        document.body.insertBefore(box, document.body.firstChild);
+      }
+      box.textContent = "VERSION v3\nCarpetas recibidas: " + raiz.folders.length +
+        "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
+        (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
+              "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
+              "\nnuevo: " + esNuevo(av) : "");
     }
 
     function mostrarError(e) {
@@ -257,6 +274,7 @@
         lista.appendChild(b);
       });
       document.getElementById("puntoNuevo").style.display = hayNuevo ? "block" : "none";
+      if (/debug/.test(location.search)) mostrarDebug();
 
       raiz.files.forEach(a => {
         const b = document.createElement("button");
