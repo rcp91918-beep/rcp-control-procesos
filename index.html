@@ -140,10 +140,10 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v3</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v4</small></footer>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxjXKfUxqh9Q_i-7VZGsBc_dr57CUUH2kGXJZEfug74K5VWHqpi7znTy-jHdy5gSdbjhQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwG5PAQKNt0-RLGs7Ij8VVh9pe_CAgUrGBgKgEccC1jSYN_hM_vTP7Xqg2OKCBdyP22Vw/exec";
 
     const cache = {};
     let raiz = null;      // datos de la carpeta raíz
@@ -207,7 +207,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v3\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v4\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
