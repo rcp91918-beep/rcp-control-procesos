@@ -157,7 +157,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v13</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v14</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwG5PAQKNt0-RLGs7Ij8VVh9pe_CAgUrGBgKgEccC1jSYN_hM_vTP7Xqg2OKCBdyP22Vw/exec";
@@ -224,7 +224,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v13\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v14\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -362,6 +362,21 @@
       }
 
       externo("🎵 TikTok RCP", "https://www.tiktok.com/@rcp_reaccionaprocesos");
+
+      /* Compartir app: hoja de compartir del teléfono; si no existe, WhatsApp directo */
+      const compartir = document.createElement("button");
+      compartir.className = "menu-item";
+      compartir.textContent = "📲 Compartir app";
+      compartir.onclick = async () => {
+        const enlace = "https://rcp91918-beep.github.io/rcp-control-procesos/";
+        const texto = "🔵🔴 ¡Entra a la app de RCP! Encuentra los materiales de tus 10 semestres, avisos, malla curricular y más. Compártela con tus compañeros 👇\n" + enlace;
+        if (navigator.share) {
+          try { await navigator.share({ text: texto }); } catch (e) { /* el usuario canceló */ }
+        } else {
+          window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank", "noopener");
+        }
+      };
+      lista.appendChild(compartir);
     }
 
     async function abrir(id, nombre, nivel) {
