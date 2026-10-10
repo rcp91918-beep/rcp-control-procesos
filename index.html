@@ -40,6 +40,9 @@
     .menu-lista { padding: 12px; overflow-y: auto; }
     .menu-item { display: flex; align-items: center; justify-content: flex-start; width: 100%; text-align: left; padding: 15px 16px; margin-bottom: 8px; border: none; border-radius: 10px; background: #eef1f8; color: var(--azul-oscuro); font-size: 16px; cursor: pointer; }
     .menu-item:hover { background: var(--rojo); color: white; }
+    .submenu { margin: -2px 0 8px 14px; padding-left: 10px; border-left: 3px solid var(--azul); }
+    .submenu .menu-item { padding: 11px 14px; margin-bottom: 6px; font-size: 15px; background: #f6f8fc; }
+    .flechita { margin-left: auto; font-size: 13px; }
 
     /* AVISO DE NOVEDAD */
     .nuevo { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 8px; margin-left: 10px; border-radius: 12px; background: #16a34a; color: white; font-size: 13px; font-weight: bold; flex-shrink: 0; }
@@ -153,7 +156,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v11</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v12</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwG5PAQKNt0-RLGs7Ij8VVh9pe_CAgUrGBgKgEccC1jSYN_hM_vTP7Xqg2OKCBdyP22Vw/exec";
@@ -220,7 +223,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v11\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v12\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -274,6 +277,7 @@
       } catch (e) { mostrarError(e); }
     }
 
+    let icpAbierto = false;
     function armarMenu() {
       const lista = document.getElementById("menuLista");
       lista.innerHTML = "";
@@ -317,18 +321,46 @@
       });
 
       /* enlaces externos: se abren en otra pestaña y el menú queda abierto, así al volver estás en el menú */
-      [
-        ["🎓 Perfil UAGRM", "https://perfil.uagrm.edu.bo/estudiantes/default.php"],
-        ["🏫 UAGRM PRESENCIAL", "https://presencial.uagrm.edu.bo/"],
-        ["📘 Mi Carrera (ICP)", "https://www.uagrm.edu.bo/carreras/fcet-cicp"],
-        ["🎵 TikTok RCP", "https://www.tiktok.com/@rcp_reaccionaprocesos"]
-      ].forEach(([texto, url]) => {
+      const externo = (texto, url) => {
         const b = document.createElement("button");
         b.className = "menu-item";
         b.textContent = texto;
         b.onclick = () => window.open(url, "_blank", "noopener");
         lista.appendChild(b);
-      });
+      };
+      externo("🎓 Perfil UAGRM", "https://perfil.uagrm.edu.bo/estudiantes/default.php");
+      externo("🏫 UAGRM PRESENCIAL", "https://presencial.uagrm.edu.bo/");
+
+      /* Mi Carrera (ICP): submenú desplegable */
+      const BASE_ICP = "https://www.uagrm.edu.bo/carreras/fcet-cicp";
+      const SECCIONES_ICP = [
+        ["Bienvenida", "bienvenida"], ["Creación", "creacion"], ["Marco Institucional", "marco-institucional"],
+        ["Objetivo", "objetivo"], ["Perfil Profesional", "perfil-profesional"], ["Campo laboral", "campo-laboral"],
+        ["Laboratorio", "laboratorio"], ["Malla Curricular", "malla-curricular"], ["Contacto", "contacto"]
+      ];
+      const carrera = document.createElement("button");
+      carrera.className = "menu-item";
+      carrera.textContent = "📘 Mi Carrera (ICP)";
+      const fl = document.createElement("span");
+      fl.className = "flechita";
+      fl.textContent = icpAbierto ? "▲" : "▼";
+      carrera.appendChild(fl);
+      carrera.onclick = () => { icpAbierto = !icpAbierto; armarMenu(); };
+      lista.appendChild(carrera);
+      if (icpAbierto) {
+        const sub = document.createElement("div");
+        sub.className = "submenu";
+        SECCIONES_ICP.forEach(([texto, ancla]) => {
+          const b = document.createElement("button");
+          b.className = "menu-item";
+          b.textContent = texto;
+          b.onclick = () => window.open(BASE_ICP + "#" + ancla, "_blank", "noopener");
+          sub.appendChild(b);
+        });
+        lista.appendChild(sub);
+      }
+
+      externo("🎵 TikTok RCP", "https://www.tiktok.com/@rcp_reaccionaprocesos");
     }
 
     async function abrir(id, nombre, nivel) {
