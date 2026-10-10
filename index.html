@@ -42,6 +42,7 @@
     .menu-item:hover { background: var(--rojo); color: white; }
     .submenu { margin: -2px 0 8px 14px; padding-left: 10px; border-left: 3px solid var(--azul); }
     .submenu .menu-item { padding: 11px 14px; margin-bottom: 6px; font-size: 15px; background: #f6f8fc; }
+    .submenu .menu-item:hover, .submenu .menu-item:active { background: var(--rojo); color: white; }
     .flechita { margin-left: auto; font-size: 13px; }
 
     /* AVISO DE NOVEDAD */
@@ -156,7 +157,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v12</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v13</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwG5PAQKNt0-RLGs7Ij8VVh9pe_CAgUrGBgKgEccC1jSYN_hM_vTP7Xqg2OKCBdyP22Vw/exec";
@@ -223,7 +224,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v12\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v13\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
