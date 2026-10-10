@@ -25,7 +25,8 @@
     .hamburguesa span { display: block; width: 28px; height: 3px; background: white; border-radius: 2px; }
     .hamburguesa:hover span { background: #ffd0d2; }
     .marca { display: flex; align-items: center; gap: 14px; cursor: pointer; }
-    #logo { height: 64px; width: auto; display: block; }
+    .logo-aro { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: transparent; }
+    #logo { width: 110%; height: 110%; max-width: none; margin: -5%; display: block; }
     .logo-texto { width: 64px; height: 64px; border-radius: 50%; background: var(--rojo); border: 3px solid white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; letter-spacing: 1px; }
     .marca h1 { font-size: 24px; line-height: 1.1; }
     .marca p { font-size: 14px; opacity: 0.9; margin-top: 3px; }
@@ -93,8 +94,7 @@
     footer { margin-top: 50px; padding: 22px; text-align: center; background: var(--azul-oscuro); color: white; border-top: 5px solid var(--rojo); }
 
     @media (max-width: 600px) {
-      #logo, .logo-texto { height: 50px; width: 50px; }
-      #logo { width: auto; }
+      .logo-aro, .logo-texto { height: 50px; width: 50px; }
       .marca h1 { font-size: 18px; }
       .marca p { font-size: 12px; }
     }
@@ -108,8 +108,8 @@
         <span></span><span></span><span></span><i id="puntoNuevo"></i>
       </button>
       <div class="marca" onclick="irInicio()">
-        <img id="logo" src="logo.png" alt="Logo RCP"
-             onerror="this.style.display='none';document.getElementById('logoTexto').style.display='flex';">
+        <span class="logo-aro" id="logoAro"><img id="logo" src="logo.png" alt="Logo RCP"
+             onerror="document.getElementById('logoAro').style.display='none';document.getElementById('logoTexto').style.display='flex';"></span>
         <div id="logoTexto" class="logo-texto">RCP</div>
         <div>
           <h1>RCP</h1>
@@ -157,7 +157,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v14</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v15</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwG5PAQKNt0-RLGs7Ij8VVh9pe_CAgUrGBgKgEccC1jSYN_hM_vTP7Xqg2OKCBdyP22Vw/exec";
@@ -224,7 +224,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v14\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v15\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
