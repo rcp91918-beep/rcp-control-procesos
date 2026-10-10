@@ -153,7 +153,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v10</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v11</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwG5PAQKNt0-RLGs7Ij8VVh9pe_CAgUrGBgKgEccC1jSYN_hM_vTP7Xqg2OKCBdyP22Vw/exec";
@@ -220,7 +220,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v10\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v11\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -320,6 +320,7 @@
       [
         ["🎓 Perfil UAGRM", "https://perfil.uagrm.edu.bo/estudiantes/default.php"],
         ["🏫 UAGRM PRESENCIAL", "https://presencial.uagrm.edu.bo/"],
+        ["📘 Mi Carrera (ICP)", "https://www.uagrm.edu.bo/carreras/fcet-cicp"],
         ["🎵 TikTok RCP", "https://www.tiktok.com/@rcp_reaccionaprocesos"]
       ].forEach(([texto, url]) => {
         const b = document.createElement("button");
