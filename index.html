@@ -157,7 +157,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>INGENIERIA DE CONTROL DE PROCESOS<br><small style="opacity:.6">v15</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v16</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwG5PAQKNt0-RLGs7Ij8VVh9pe_CAgUrGBgKgEccC1jSYN_hM_vTP7Xqg2OKCBdyP22Vw/exec";
@@ -224,7 +224,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v15\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v16\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -268,7 +268,7 @@
         enInicio = true;
         actual = {
           id: raiz.id,
-          name: "Ingeniería de Control de Procesos",
+          name: "Semestres",
           folders: raiz.folders.filter(f => esSemestre(f.name)),
           files: []
         };
@@ -394,9 +394,20 @@
       } catch (e) { mostrarError(e); }
     }
 
+    /* orden fijo de las carpetas de cada materia; las demás quedan después, en su orden normal */
+    function ordenCarpeta(nombre) {
+      const n = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+      if (/(primer|1er|1ro|1\s*°?)\s*parcial/.test(n)) return 1;
+      if (/(segundo|2do|2\s*°?)\s*parcial/.test(n)) return 2;
+      if (/examen\s*final|^final/.test(n)) return 3;
+      if (/repechaje/.test(n)) return 4;
+      if (/practic/.test(n)) return 5;
+      return 99;
+    }
+
     function dibujar(d, filtro) {
       const f = (filtro || "").toLowerCase();
-      const carpetas = d.folders.filter(x => x.name.toLowerCase().includes(f));
+      const carpetas = d.folders.filter(x => x.name.toLowerCase().includes(f)).sort((a, b) => ordenCarpeta(a.name) - ordenCarpeta(b.name));
       const archivos = d.files.filter(x => x.name.toLowerCase().includes(f));
 
       document.getElementById("titulo").innerText = d.name.trim();
