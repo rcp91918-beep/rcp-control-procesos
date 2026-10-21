@@ -90,7 +90,13 @@
     .lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px; }
     .anio { margin-bottom: 14px; }
     .anio-titulo { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5b6b8c; margin-bottom: 6px; }
-    .anio .lista { gap: 6px; }
+    .sem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sem { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 12px 14px; border: 3px solid var(--azul); border-radius: 18px; background: var(--azul); color: white; font-family: inherit; text-align: left; cursor: pointer; transition: 0.2s; }
+    .sem:hover { background: var(--rojo); border-color: var(--rojo); }
+    .sem.actual { border-color: var(--rojo); }
+    .sem-num { font-family: 'Bricolage Grotesque', Arial, sans-serif; font-size: 34px; font-weight: 600; line-height: 1.1; }
+    .sem-nom { font-size: 17px; font-weight: 500; }
+    .sem-sub { font-size: 13px; opacity: 0.85; }
     .carpeta { height: 48px; padding: 0 16px; border: none; border-radius: 14px; background: var(--azul); color: white; font-family: inherit; font-size: 16px; font-weight: 500; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
     .carpeta:hover { background: var(--rojo); transform: translateY(-2px); }
     .fila { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 14px 8px 12px; border: 1px solid #e3e8f2; border-radius: 14px; background: white; color: var(--azul-oscuro); font-family: inherit; font-size: 16px; font-weight: 500; text-align: left; text-decoration: none; cursor: pointer; box-shadow: 0 1px 6px rgba(11,37,89,0.06); word-break: break-word; }
@@ -553,43 +559,37 @@
       return 99;
     }
 
-    function botonSemestre(c) {
-      const b = document.createElement("button");
-      b.className = "carpeta";
-      b.textContent = c.name.trim();
-      b.onclick = () => {
-        camino = [{ id: raiz.id, name: raiz.name }];
-        origenMenu = false;
-        abrir(c.id, c.name);
-      };
-      return b;
-    }
-
-    /* Pantalla principal: semestres agrupados por año (1-2 = 1.er año, 3-4 = 2.º año...) */
+    /* Pantalla principal: semestres en dos columnas, como tarjetas */
+    const ACTUAL_KEY = "rcp_actual";
     function dibujarSemestres(cont, carpetas) {
-      const num = carpetas.map(c => ({ c: c, n: parseInt((c.name.match(/\d+/) || [])[0], 10) }));
-      if (num.some(x => isNaN(x.n))) {
-        const g = document.createElement("div");
-        g.className = "lista";
-        carpetas.forEach(c => g.appendChild(botonSemestre(c)));
-        cont.appendChild(g);
-        return;
-      }
-      const porAnio = {};
-      num.forEach(x => { const a = Math.ceil(x.n / 2); (porAnio[a] = porAnio[a] || []).push(x.c); });
-      Object.keys(porAnio).map(Number).sort((a, b) => a - b).forEach(a => {
-        const bloque = document.createElement("div");
-        bloque.className = "anio";
-        const t = document.createElement("div");
-        t.className = "anio-titulo";
-        t.textContent = a === 1 ? "1.er año" : a + ".º año";
-        bloque.appendChild(t);
-        const g = document.createElement("div");
-        g.className = "lista";
-        porAnio[a].forEach(c => g.appendChild(botonSemestre(c)));
-        bloque.appendChild(g);
-        cont.appendChild(bloque);
+      let actualId = null;
+      try { actualId = localStorage.getItem(ACTUAL_KEY); } catch (e) {}
+      const g = document.createElement("div");
+      g.className = "sem-grid";
+      carpetas.forEach(c => {
+        const n = (c.name.match(/\d+/) || [""])[0];
+        const b = document.createElement("button");
+        b.className = "sem" + (c.id === actualId ? " actual" : "");
+        b.innerHTML = '<span class="sem-num"></span><span class="sem-nom">Semestre</span><span class="sem-sub"></span>';
+        b.querySelector(".sem-num").textContent = n || c.name.trim();
+        if (!n) b.querySelector(".sem-nom").style.display = "none";
+        const sub = b.querySelector(".sem-sub");
+        sub.textContent = c.id === actualId ? "Tu semestre actual" : "\u00a0";
+        b.onclick = () => {
+          try { localStorage.setItem(ACTUAL_KEY, c.id); } catch (e) {}
+          camino = [{ id: raiz.id, name: raiz.name }];
+          origenMenu = false;
+          abrir(c.id, c.name);
+        };
+        g.appendChild(b);
+        if (c.id !== actualId) {
+          cargar(c.id).then(d => {
+            if (!enInicio) return;
+            sub.textContent = d.folders.length + (d.folders.length === 1 ? " materia" : " materias");
+          }).catch(() => {});
+        }
       });
+      cont.appendChild(g);
     }
 
     function dibujar(d, filtro) {
