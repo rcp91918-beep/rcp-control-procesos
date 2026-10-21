@@ -215,7 +215,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v18</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v2</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxMtQkbagMPvafgXhxXQHyKOQMWFqwWsA4SAkrPknShFYXE-1kKy4UVDC7yhWAiFIc__A/exec";
@@ -330,7 +330,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v18\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v2\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -529,7 +529,7 @@
       pie.appendChild(compartir);
       const ver = document.createElement("div");
       ver.className = "menu-ver";
-      ver.textContent = "RCP · versión v18";
+      ver.textContent = "RCP · versión v2";
       pie.appendChild(ver);
     }
 
