@@ -215,7 +215,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v2</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v2.1</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxMtQkbagMPvafgXhxXQHyKOQMWFqwWsA4SAkrPknShFYXE-1kKy4UVDC7yhWAiFIc__A/exec";
@@ -330,7 +330,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v2\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v2.1\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -529,7 +529,7 @@
       pie.appendChild(compartir);
       const ver = document.createElement("div");
       ver.className = "menu-ver";
-      ver.textContent = "RCP · versión v2";
+      ver.textContent = "RCP · versión v2.1";
       pie.appendChild(ver);
     }
 
@@ -577,6 +577,7 @@
         sub.textContent = c.id === actualId ? "Tu semestre actual" : "\u00a0";
         b.onclick = () => {
           try { localStorage.setItem(ACTUAL_KEY, c.id); } catch (e) {}
+          umbralNuevo = null;
           camino = [{ id: raiz.id, name: raiz.name }];
           origenMenu = false;
           abrir(c.id, c.name);
@@ -633,7 +634,7 @@
           b.className = "fila";
           b.innerHTML = '<span class="ico-carpeta">' + svgIcono(IC.carpeta) + '</span><span class="txt"></span><span class="trail">' + svgIcono(IC.der) + '</span>';
           b.querySelector(".txt").textContent = c.name.trim();
-          if (umbralNuevo !== null && (c.updated || 0) > umbralNuevo) b.insertBefore(crearBadge("✓ Nuevo"), b.querySelector(".trail"));
+          if (origenMenu && umbralNuevo !== null && (c.updated || 0) > umbralNuevo) b.insertBefore(crearBadge("✓ Nuevo"), b.querySelector(".trail"));
           b.onclick = () => abrir(c.id, c.name);
           g.appendChild(b);
         });
@@ -660,7 +661,7 @@
           if (tipo.clase) ext.classList.add(tipo.clase);
           l.querySelector(".nom").textContent = a.name;
           l.querySelector(".fec").textContent = fechaCorta(a.updated || 0);
-          if (umbralNuevo !== null && (a.updated || 0) > umbralNuevo) l.appendChild(crearBadge("✓ Nuevo"));
+          if (origenMenu && umbralNuevo !== null && (a.updated || 0) > umbralNuevo) l.appendChild(crearBadge("✓ Nuevo"));
           g.appendChild(l);
         });
         cont.appendChild(g);
