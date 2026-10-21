@@ -91,12 +91,13 @@
     .anio { margin-bottom: 14px; }
     .anio-titulo { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5b6b8c; margin-bottom: 6px; }
     .sem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .sem { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 12px 14px; border: 3px solid var(--azul); border-radius: 18px; background: var(--azul); color: white; font-family: inherit; text-align: left; cursor: pointer; transition: 0.2s; }
-    .sem:hover { background: var(--rojo); border-color: var(--rojo); }
-    .sem.actual { border-color: var(--rojo); }
-    .sem-num { font-family: 'Bricolage Grotesque', Arial, sans-serif; font-size: 34px; font-weight: 600; line-height: 1.1; }
-    .sem-nom { font-size: 17px; font-weight: 500; }
-    .sem-sub { font-size: 13px; opacity: 0.85; }
+    .sem { display: flex; flex-direction: column; align-items: flex-start; height: 116px; padding: 12px 14px; border: 3px solid var(--c); border-radius: 18px; background: var(--c); color: white; font-family: inherit; text-align: left; cursor: pointer; transition: 0.2s; }
+    .sem:hover { filter: brightness(1.15); transform: translateY(-2px); }
+    .sem.actual { border-color: var(--rojo); outline: 2px solid white; outline-offset: -5px; }
+    .sem-anio { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.78); }
+    .sem-num { font-family: 'Bricolage Grotesque', Arial, sans-serif; font-size: 32px; font-weight: 700; line-height: 1.1; }
+    .sem-nom { font-size: 14px; }
+    .sem-sub { font-size: 12px; color: rgba(255,255,255,0.85); }
     .carpeta { height: 48px; padding: 0 16px; border: none; border-radius: 14px; background: var(--azul); color: white; font-family: inherit; font-size: 16px; font-weight: 500; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
     .carpeta:hover { background: var(--rojo); transform: translateY(-2px); }
     .fila { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 14px 8px 12px; border: 1px solid #e3e8f2; border-radius: 14px; background: white; color: var(--azul-oscuro); font-family: inherit; font-size: 16px; font-weight: 500; text-align: left; text-decoration: none; cursor: pointer; box-shadow: 0 1px 6px rgba(11,37,89,0.06); word-break: break-word; }
@@ -215,7 +216,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v2.1</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v2.2</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxMtQkbagMPvafgXhxXQHyKOQMWFqwWsA4SAkrPknShFYXE-1kKy4UVDC7yhWAiFIc__A/exec";
@@ -330,7 +331,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v2.1\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v2.2\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -529,7 +530,7 @@
       pie.appendChild(compartir);
       const ver = document.createElement("div");
       ver.className = "menu-ver";
-      ver.textContent = "RCP · versión v2.1";
+      ver.textContent = "RCP · versión v2.2";
       pie.appendChild(ver);
     }
 
@@ -561,6 +562,7 @@
 
     /* Pantalla principal: semestres en dos columnas, como tarjetas */
     const ACTUAL_KEY = "rcp_actual";
+    const COLORES_ANIO = ["#123b8f", "#0f6b6b", "#5b3fa8", "#b4570a", "#0b2559"];
     function dibujarSemestres(cont, carpetas) {
       let actualId = null;
       try { actualId = localStorage.getItem(ACTUAL_KEY); } catch (e) {}
@@ -570,7 +572,9 @@
         const n = (c.name.match(/\d+/) || [""])[0];
         const b = document.createElement("button");
         b.className = "sem" + (c.id === actualId ? " actual" : "");
-        b.innerHTML = '<span class="sem-num"></span><span class="sem-nom">Semestre</span><span class="sem-sub"></span>';
+        b.style.setProperty("--c", COLORES_ANIO[Math.min(4, Math.max(0, Math.ceil((parseInt(n, 10) || 1) / 2) - 1))]);
+        b.innerHTML = '<span class="sem-anio"></span><span class="sem-num"></span><span class="sem-nom">Semestre</span><span class="sem-sub"></span>';
+        b.querySelector(".sem-anio").textContent = n ? (Math.ceil(parseInt(n, 10) / 2) === 1 ? "1.er año" : Math.ceil(parseInt(n, 10) / 2) + ".º año") : "";
         b.querySelector(".sem-num").textContent = n || c.name.trim();
         if (!n) b.querySelector(".sem-nom").style.display = "none";
         const sub = b.querySelector(".sem-sub");
