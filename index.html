@@ -7,6 +7,8 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#123b8f">
   <link rel="apple-touch-icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --rojo: #d71920;
@@ -16,7 +18,7 @@
       --fondo: #f3f5f9;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: var(--fondo); color: #1f2937; }
+    body { font-family: 'Figtree', Arial, sans-serif; background: var(--fondo); color: #1f2937; }
 
     /* ENCABEZADO */
     header { background: linear-gradient(135deg, var(--azul-oscuro), var(--azul)); color: white; border-bottom: 5px solid var(--rojo); position: sticky; top: 0; z-index: 50; }
@@ -28,23 +30,39 @@
     .logo-aro { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: transparent; }
     #logo { width: 110%; height: 110%; max-width: none; margin: -5%; display: block; }
     .logo-texto { width: 64px; height: 64px; border-radius: 50%; background: var(--rojo); border: 3px solid white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; letter-spacing: 1px; }
-    .marca h1 { font-size: 24px; line-height: 1.1; }
+    .marca h1 { font-family: 'Bricolage Grotesque', Arial, sans-serif; font-size: 24px; line-height: 1.1; }
     .marca p { font-size: 14px; opacity: 0.9; margin-top: 3px; }
 
     /* MENU LATERAL */
     #fondoMenu { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 80; }
     #fondoMenu.abierto { display: block; }
-    #menu { position: fixed; top: 0; left: 0; bottom: 0; width: 290px; max-width: 85%; background: white; z-index: 90; transform: translateX(-100%); transition: transform 0.25s; display: flex; flex-direction: column; box-shadow: 4px 0 18px rgba(0,0,0,0.25); }
+    #menu { position: fixed; top: 0; left: 0; bottom: 0; width: 310px; max-width: 88%; background: white; z-index: 90; transform: translateX(-100%); transition: transform 0.25s; display: flex; flex-direction: column; box-shadow: 4px 0 18px rgba(0,0,0,0.25); }
     #menu.abierto { transform: translateX(0); }
-    .menu-cab { background: var(--azul); color: white; padding: 20px; font-size: 18px; font-weight: bold; border-bottom: 4px solid var(--rojo); display: flex; justify-content: space-between; align-items: center; }
-    .menu-cab button { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
-    .menu-lista { padding: 12px; overflow-y: auto; }
-    .menu-item { display: flex; align-items: center; justify-content: flex-start; width: 100%; text-align: left; padding: 15px 16px; margin-bottom: 8px; border: none; border-radius: 10px; background: #eef1f8; color: var(--azul-oscuro); font-size: 16px; cursor: pointer; }
-    .menu-item:hover { background: var(--rojo); color: white; }
-    .submenu { margin: -2px 0 8px 14px; padding-left: 10px; border-left: 3px solid var(--azul); }
-    .submenu .menu-item { padding: 11px 14px; margin-bottom: 6px; font-size: 15px; background: #f6f8fc; }
+    .menu-cab { background: var(--azul); color: white; padding: 16px 18px; border-bottom: 4px solid var(--rojo); display: flex; align-items: center; gap: 12px; }
+    .menu-cab .aro { width: 44px; height: 44px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: white; }
+    .menu-cab .aro img { width: 110%; height: 110%; max-width: none; margin: -5%; display: block; }
+    .menu-cab .tit { flex: 1; font-family: 'Bricolage Grotesque', Arial, sans-serif; font-size: 22px; font-weight: 700; }
+    .menu-cab button { background: none; border: none; color: white; font-size: 28px; cursor: pointer; width: 40px; height: 40px; }
+    .menu-lista { padding: 8px 12px; overflow-y: auto; flex: 1; }
+    .menu-titulo { padding: 14px 8px 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5b6b8c; }
+    .menu-item { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 7px 8px; margin-bottom: 2px; border: none; border-radius: 14px; background: transparent; color: var(--azul-oscuro); font-family: inherit; font-size: 16px; font-weight: 500; cursor: pointer; }
+    .menu-item:hover, .menu-item:active { background: var(--rojo); color: white; }
+    .menu-item .ico { width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #e6edfb; color: var(--azul); }
+    .menu-item .ico.alerta { background: #fde8e9; color: var(--rojo); }
+    .menu-item:hover .ico, .menu-item:active .ico { background: rgba(255,255,255,0.22); color: white; }
+    .menu-item .txt { flex: 1; }
+    .menu-item .trail { display: flex; color: #8a97b3; }
+    .menu-item:hover .trail, .menu-item:active .trail { color: white; }
+    .ico svg, .trail svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .trail svg { width: 18px; height: 18px; }
+    .submenu { margin: 0 0 8px 24px; padding-left: 10px; border-left: 3px solid var(--azul); }
+    .submenu .menu-item { padding: 10px 12px; margin-bottom: 4px; font-size: 15px; background: #f6f8fc; }
     .submenu .menu-item:hover, .submenu .menu-item:active { background: var(--rojo); color: white; }
-    .flechita { margin-left: auto; font-size: 13px; }
+    .menu-pie { padding: 12px 14px 20px; border-top: 1px solid #e3e8f2; display: flex; flex-direction: column; gap: 8px; }
+    .btn-compartir { display: flex; align-items: center; justify-content: center; gap: 10px; height: 48px; border: none; border-radius: 14px; background: var(--azul); color: white; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+    .btn-compartir:hover, .btn-compartir:active { background: var(--rojo); }
+    .btn-compartir svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .menu-ver { text-align: center; font-size: 12px; color: #5b6b8c; }
 
     /* AVISO DE NOVEDAD */
     .nuevo { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 8px; margin-left: 10px; border-radius: 12px; background: #16a34a; color: white; font-size: 13px; font-weight: bold; flex-shrink: 0; }
@@ -54,23 +72,52 @@
     #puntoNuevo { display: none; position: absolute; top: 2px; right: 2px; width: 13px; height: 13px; border-radius: 50%; background: #22c55e; border: 2px solid white; }
 
     /* CONTENIDO */
-    .contenedor { max-width: 1100px; margin: 25px auto; padding: 0 18px; }
-    .buscador { width: 100%; padding: 15px; font-size: 17px; border: 2px solid #d5d9e4; border-radius: 10px; margin-bottom: 20px; outline: none; }
-    .buscador:focus { border-color: var(--azul); }
-    .volver { margin-bottom: 14px; padding: 10px 18px; border: none; border-radius: 8px; background: var(--rojo); color: white; font-size: 15px; cursor: pointer; }
+    .contenedor { max-width: 1100px; margin: 20px auto; padding: 0 18px; }
+    .nav-fila { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .volver { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; height: 40px; padding: 0 14px 0 10px; border: none; border-radius: 12px; background: var(--rojo); color: white; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
     .volver:hover { background: var(--rojo-oscuro); }
-    .ruta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 15px; font-size: 15px; }
-    .ruta a { color: var(--azul); cursor: pointer; }
+    .volver svg { width: 18px; height: 18px; fill: none; stroke: white; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .ruta { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; font-size: 13px; min-width: 0; }
+    .ruta a { color: #5b6b8c; cursor: pointer; }
+    .ruta a:last-child { color: var(--azul-oscuro); font-weight: 600; }
     .ruta a:hover { text-decoration: underline; }
-    .ruta span { color: #6b7280; }
-    .seccion { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-top: 4px solid var(--azul); }
-    .seccion h2 { color: var(--azul-oscuro); margin-bottom: 18px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 15px; }
-    .carpeta { padding: 20px; border: none; border-radius: 10px; background: var(--azul); color: white; font-size: 18px; cursor: pointer; transition: 0.2s; }
+    .ruta span { color: #8a97b3; }
+    .buscador { width: 100%; height: 46px; padding: 0 14px; font-family: inherit; font-size: 16px; border: 1.5px solid #d4dbea; border-radius: 14px; margin-bottom: 16px; outline: none; background: white; }
+    .buscador:focus { border-color: var(--azul); }
+    .seccion { background: white; padding: 20px 18px; border-radius: 18px; box-shadow: 0 2px 10px rgba(11,37,89,0.08); border-top: 4px solid var(--azul); }
+    .seccion h2 { font-family: 'Bricolage Grotesque', Arial, sans-serif; color: var(--azul-oscuro); font-size: 24px; margin-bottom: 14px; }
+    h3 { color: #5b6b8c; margin: 20px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+    .lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px; }
+    .anio { margin-bottom: 14px; }
+    .anio-titulo { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5b6b8c; margin-bottom: 6px; }
+    .anio .lista { gap: 6px; }
+    .carpeta { height: 48px; padding: 0 16px; border: none; border-radius: 14px; background: var(--azul); color: white; font-family: inherit; font-size: 16px; font-weight: 500; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
     .carpeta:hover { background: var(--rojo); transform: translateY(-2px); }
-    .archivo { display: block; padding: 16px; border-radius: 10px; background: #eef1f8; color: var(--azul-oscuro); text-decoration: none; font-size: 16px; border: 1px solid #d5d9e4; word-break: break-word; }
-    .archivo:hover { background: #fde4e5; border-color: var(--rojo); }
-    h3 { color: var(--azul-oscuro); margin: 25px 0 12px; font-size: 18px; }
+    .fila { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 14px 8px 12px; border: 1px solid #e3e8f2; border-radius: 14px; background: white; color: var(--azul-oscuro); font-family: inherit; font-size: 16px; font-weight: 500; text-align: left; text-decoration: none; cursor: pointer; box-shadow: 0 1px 6px rgba(11,37,89,0.06); word-break: break-word; }
+    .fila:hover { background: #fde4e5; border-color: var(--rojo); }
+    .fila .txt { flex: 1; min-width: 0; }
+    .fila .nom { font-size: 15px; }
+    .fila .fec { font-size: 12px; font-weight: 400; color: #5b6b8c; margin-top: 2px; }
+    .ico-carpeta svg { width: 24px; height: 24px; fill: #e6edfb; stroke: var(--azul); stroke-width: 1.8; stroke-linejoin: round; display: block; }
+    .fila .trail { display: flex; color: #8a97b3; }
+    .fila .trail svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .ext { width: 40px; height: 40px; border-radius: 11px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; background: #eef1f8; color: #4a5568; }
+    .ext.pdf { background: #fde8e9; color: #b3141b; }
+    .ext.img { background: #e6edfb; color: #123b8f; }
+    .ext.doc { background: #e3f0ff; color: #1d5fb4; }
+    .ext.xls { background: #e2f5e8; color: #15803d; }
+    .ext.ppt { background: #fdecd9; color: #b45309; }
+    .aviso-card { display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 16px; padding: 14px 16px; border: none; border-radius: 18px; background: white; box-shadow: 0 2px 10px rgba(11,37,89,0.08); font-family: inherit; color: var(--azul-oscuro); text-align: left; cursor: pointer; }
+    .aviso-card:hover { background: #fde4e5; }
+    .aviso-card .ico { width: 44px; height: 44px; border-radius: 14px; background: #fde8e9; color: var(--rojo); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .aviso-card .ico svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .aviso-card .cuerpo { flex: 1; min-width: 0; }
+    .aviso-card .rot { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #5b6b8c; }
+    .aviso-card .rot .nuevo { margin-left: 0; height: 20px; min-width: 0; font-size: 11px; text-transform: none; letter-spacing: 0; }
+    .aviso-card .nom { font-size: 15px; font-weight: 600; margin-top: 2px; word-break: break-word; }
+    .aviso-card .cuando { font-size: 12px; color: #5b6b8c; margin-top: 2px; }
+    .aviso-card .trail { display: flex; color: #8a97b3; }
+    .aviso-card .trail svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
     .msg { color: #6b7280; padding: 10px 0; }
     .error { color: #b91c1c; }
 
@@ -126,16 +173,21 @@
   <div id="fondoMenu" onclick="cerrarMenu()"></div>
   <nav id="menu">
     <div class="menu-cab">
-      <span>Menú</span>
+      <span class="aro"><img src="logo.png" alt="" onerror="this.parentNode.style.display='none'"></span>
+      <span class="tit">Menú</span>
       <button onclick="cerrarMenu()" aria-label="Cerrar menú">×</button>
     </div>
     <div class="menu-lista" id="menuLista"></div>
+    <div class="menu-pie" id="menuPie"></div>
   </nav>
 
   <main class="contenedor">
-    <input type="text" id="buscador" class="buscador" placeholder="Buscar en esta carpeta..." oninput="filtrar()">
-    <button id="btnVolver" class="volver" style="display:none" onclick="volver()">← Volver</button>
-    <div id="ruta" class="ruta"></div>
+    <div id="avisoDestacado" style="display:none"></div>
+    <div id="navFila" class="nav-fila" style="display:none">
+      <button id="btnVolver" class="volver" onclick="volver()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Volver</button>
+      <div id="ruta" class="ruta"></div>
+    </div>
+    <input type="text" id="buscador" class="buscador" placeholder="Buscar en esta carpeta..." oninput="filtrar()" style="display:none">
     <section class="seccion">
       <h2 id="titulo">Cargando...</h2>
       <div id="contenido"></div>
@@ -157,7 +209,7 @@
     <iframe id="visorFrame" allow="autoplay" allowfullscreen></iframe>
   </div>
 
-  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v17</small></footer>
+  <footer>RCP · Reacciona Control de Procesos · Ingeniería de Control de Procesos<br><small style="opacity:.6">v18</small></footer>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxMtQkbagMPvafgXhxXQHyKOQMWFqwWsA4SAkrPknShFYXE-1kKy4UVDC7yhWAiFIc__A/exec";
@@ -169,6 +221,54 @@
     let enInicio = true;  // true = pantalla principal (solo semestres)
 
     const esSemestre = (n) => /^semestre/i.test(n.trim());
+
+    /* ICONOS (trazos simples, mismo estilo en todo el menú) */
+    const IC = {
+      casa: "M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z",
+      aviso: "M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15zM10 21h4",
+      info: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7.5h.01",
+      oferta: "M3 12V4h8l10 10-8 8zM7.5 8.5h.01",
+      malla: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",
+      carpeta: "M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
+      archivo: "M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3v5h5",
+      perfil: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c.8-4 4-6 8-6s7.2 2 8 6",
+      escuela: "M4 21V9l8-5 8 5v12M9 21v-6h6v6",
+      libro: "M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 21h15",
+      musica: "M9 18V5l11-2v13M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3zM20 16a3 3 0 1 1-3-3 3 3 0 0 1 3 3z",
+      compartir: "M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5",
+      der: "M9 5l7 7-7 7",
+      abajo: "M5 9l7 7 7-7",
+      arriba: "M5 15l7-7 7 7",
+      externo: "M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
+    };
+    const svgIcono = (d) => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '"/></svg>';
+    const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+    function fechaCorta(ms) {
+      if (!ms) return "";
+      const d = new Date(ms);
+      return d.getDate() + " " + MESES[d.getMonth()];
+    }
+    function haceTexto(ms) {
+      const dias = Math.floor((Date.now() - ms) / 86400000);
+      if (dias <= 0) return "hoy";
+      if (dias === 1) return "ayer";
+      if (dias < 30) return "hace " + dias + " días";
+      return "el " + fechaCorta(ms);
+    }
+    function tipoArchivo(nombre) {
+      const m = /\.([a-z0-9]+)$/i.exec(nombre.trim());
+      const ext = m ? m[1].toLowerCase() : "";
+      let clase = "";
+      if (ext === "pdf") clase = "pdf";
+      else if (/^(jpe?g|png|gif|webp|bmp|heic|heif)$/.test(ext)) clase = "img";
+      else if (/^(docx?|odt|rtf|txt)$/.test(ext)) clase = "doc";
+      else if (/^(xlsx?|csv|ods)$/.test(ext)) clase = "xls";
+      else if (/^(pptx?|odp)$/.test(ext)) clase = "ppt";
+      const etiqueta = ext === "jpeg" ? "JPG" : (ext ? ext.slice(0, 4).toUpperCase() : "ARCH");
+      return { etiqueta: etiqueta, clase: clase };
+    }
+    function nombreSinExt(nombre) { return nombre.replace(/\.[a-z0-9]{1,5}$/i, ""); }
+
 
     /* NOVEDADES: se compara la última modificación en Drive con lo que el usuario ya vio */
     const VISTO_KEY = "rcp_visto";
@@ -224,7 +324,7 @@
         box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
         document.body.insertBefore(box, document.body.firstChild);
       }
-      box.textContent = "VERSION v17\nCarpetas recibidas: " + raiz.folders.length +
+      box.textContent = "VERSION v18\nCarpetas recibidas: " + raiz.folders.length +
         "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
         (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
               "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -275,62 +375,111 @@
         dibujar(actual);
         armarMenu();
         registrarVista();
+        dibujarAviso();
       } catch (e) { mostrarError(e); }
     }
 
+    /* Tarjeta "Último aviso" de la pantalla principal */
+    async function dibujarAviso() {
+      const cont = document.getElementById("avisoDestacado");
+      cont.style.display = "none";
+      cont.innerHTML = "";
+      const av = raiz && raiz.folders.find(f => /^avisos/i.test(f.name.trim()));
+      if (!av) return;
+      try {
+        const d = await cargar(av.id);
+        if (!enInicio) return;
+        const ult = d.files.slice().sort((a, b) => (b.updated || 0) - (a.updated || 0))[0];
+        if (!ult) return;
+        const b = document.createElement("button");
+        b.className = "aviso-card";
+        b.innerHTML = '<span class="ico">' + svgIcono(IC.aviso) + '</span><span class="cuerpo"><span class="rot"></span><div class="nom"></div><div class="cuando"></div></span><span class="trail">' + svgIcono(IC.der) + '</span>';
+        const rot = b.querySelector(".rot");
+        rot.appendChild(document.createTextNode("Último aviso"));
+        if (esNuevo(av)) rot.appendChild(crearBadge("✓ Nuevo"));
+        b.querySelector(".nom").textContent = nombreSinExt(ult.name);
+        b.querySelector(".cuando").textContent = "Subido " + haceTexto(ult.updated || 0);
+        b.onclick = () => abrirCarpetaMenu(av);
+        cont.appendChild(b);
+        cont.style.display = "block";
+      } catch (e) { /* sin datos: no se muestra la tarjeta */ }
+    }
+
     let icpAbierto = false;
+    function abrirCarpetaMenu(f) {
+      cerrarMenu();
+      const previo = leerVisto()[f.id];
+      umbralNuevo = previo !== undefined ? previo : null;
+      marcarVisto(f.id, fechaCarpeta(f));
+      if (!origenMenu) vistaPrevia = vistaActual();
+      origenMenu = true;
+      camino = [{ id: raiz.id, name: raiz.name }];
+      abrir(f.id, f.name);
+      armarMenu();
+    }
+
+    function iconoCarpetaMenu(nombre) {
+      if (/aviso/i.test(nombre)) return IC.aviso;
+      if (/informaci/i.test(nombre)) return IC.info;
+      if (/oferta|maestro/i.test(nombre)) return IC.oferta;
+      if (/malla/i.test(nombre)) return IC.malla;
+      return IC.carpeta;
+    }
+
+    function itemMenu(lista, o) {
+      const b = document.createElement("button");
+      b.className = "menu-item";
+      const ico = document.createElement("span");
+      ico.className = "ico" + (o.alerta ? " alerta" : "");
+      ico.innerHTML = svgIcono(o.icono);
+      const tx = document.createElement("span");
+      tx.className = "txt";
+      tx.textContent = o.texto;
+      b.appendChild(ico);
+      b.appendChild(tx);
+      if (o.nuevo) b.appendChild(crearBadge("✓ Nuevo"));
+      const tr = document.createElement("span");
+      tr.className = "trail";
+      tr.innerHTML = svgIcono(o.trail || IC.der);
+      b.appendChild(tr);
+      b.onclick = o.onclick;
+      lista.appendChild(b);
+      return b;
+    }
+
+    function tituloMenu(lista, texto) {
+      const t = document.createElement("div");
+      t.className = "menu-titulo";
+      t.textContent = texto;
+      lista.appendChild(t);
+    }
+
     function armarMenu() {
       const lista = document.getElementById("menuLista");
       lista.innerHTML = "";
-      const inicio = document.createElement("button");
-      inicio.className = "menu-item";
-      inicio.textContent = "🏠 Inicio";
-      inicio.onclick = irInicio;
-      lista.appendChild(inicio);
+      itemMenu(lista, { texto: "Inicio", icono: IC.casa, onclick: irInicio });
 
       let hayNuevo = false;
-      raiz.folders.filter(f => !esSemestre(f.name)).forEach(f => {
-        const b = document.createElement("button");
-        b.className = "menu-item";
-        b.textContent = f.name.trim();
-        if (esNuevo(f)) {
-          hayNuevo = true;
-          b.appendChild(crearBadge("✓ Nuevo"));
-        }
-        b.onclick = () => {
-          cerrarMenu();
-          const previo = leerVisto()[f.id];
-          umbralNuevo = previo !== undefined ? previo : null;
-          marcarVisto(f.id, fechaCarpeta(f));
-          if (!origenMenu) vistaPrevia = vistaActual();
-          origenMenu = true;
-          camino = [{ id: raiz.id, name: raiz.name }];
-          abrir(f.id, f.name);
-          armarMenu();
-        };
-        lista.appendChild(b);
+      const carpetasMenu = raiz.folders.filter(f => !esSemestre(f.name));
+      if (carpetasMenu.length || raiz.files.length) tituloMenu(lista, "Contenido");
+      carpetasMenu.forEach(f => {
+        const nuevo = esNuevo(f);
+        if (nuevo) hayNuevo = true;
+        itemMenu(lista, { texto: f.name.trim(), icono: iconoCarpetaMenu(f.name), nuevo: nuevo, alerta: nuevo, onclick: () => abrirCarpetaMenu(f) });
       });
       document.getElementById("puntoNuevo").style.display = hayNuevo ? "block" : "none";
       if (/debug/.test(location.search)) mostrarDebug();
 
       raiz.files.forEach(a => {
-        const b = document.createElement("button");
-        b.className = "menu-item";
-        b.textContent = "📄 " + a.name;
-        b.onclick = () => { cerrarMenu(); abrirVisor(a, raiz.files); };
-        lista.appendChild(b);
+        itemMenu(lista, { texto: a.name, icono: IC.archivo, onclick: () => { cerrarMenu(); abrirVisor(a, raiz.files); } });
       });
 
       /* enlaces externos: se abren en otra pestaña y el menú queda abierto, así al volver estás en el menú */
-      const externo = (texto, url) => {
-        const b = document.createElement("button");
-        b.className = "menu-item";
-        b.textContent = texto;
-        b.onclick = () => window.open(url, "_blank", "noopener");
-        lista.appendChild(b);
-      };
-      externo("🎓 Perfil UAGRM", "https://perfil.uagrm.edu.bo/estudiantes/default.php");
-      externo("🏫 UAGRM PRESENCIAL", "https://presencial.uagrm.edu.bo/");
+      const externo = (texto, icono, url) => itemMenu(lista, { texto: texto, icono: icono, trail: IC.externo, onclick: () => window.open(url, "_blank", "noopener") });
+
+      tituloMenu(lista, "Enlaces");
+      externo("Perfil UAGRM", IC.perfil, "https://perfil.uagrm.edu.bo/estudiantes/default.php");
+      externo("UAGRM Presencial", IC.escuela, "https://presencial.uagrm.edu.bo/");
 
       /* Mi Carrera (ICP): submenú desplegable */
       const BASE_ICP = "https://www.uagrm.edu.bo/carreras/fcet-cicp";
@@ -339,15 +488,7 @@
         ["Objetivo", "objetivo"], ["Perfil Profesional", "perfil-profesional"], ["Campo laboral", "campo-laboral"],
         ["Laboratorio", "laboratorio"], ["Malla Curricular", "malla-curricular"], ["Contacto", "contacto"]
       ];
-      const carrera = document.createElement("button");
-      carrera.className = "menu-item";
-      carrera.textContent = "📘 Mi Carrera (ICP)";
-      const fl = document.createElement("span");
-      fl.className = "flechita";
-      fl.textContent = icpAbierto ? "▲" : "▼";
-      carrera.appendChild(fl);
-      carrera.onclick = () => { icpAbierto = !icpAbierto; armarMenu(); };
-      lista.appendChild(carrera);
+      itemMenu(lista, { texto: "Mi Carrera (ICP)", icono: IC.libro, trail: icpAbierto ? IC.arriba : IC.abajo, onclick: () => { icpAbierto = !icpAbierto; armarMenu(); } });
       if (icpAbierto) {
         const sub = document.createElement("div");
         sub.className = "submenu";
@@ -361,12 +502,15 @@
         lista.appendChild(sub);
       }
 
-      externo("🎵 TikTok RCP", "https://www.tiktok.com/@rcp_reaccionaprocesos");
+      tituloMenu(lista, "Síguenos");
+      externo("TikTok RCP", IC.musica, "https://www.tiktok.com/@rcp_reaccionaprocesos");
 
-      /* Compartir app: hoja de compartir del teléfono; si no existe, WhatsApp directo */
+      /* Pie: Compartir app (hoja de compartir del teléfono; si no existe, WhatsApp directo) */
+      const pie = document.getElementById("menuPie");
+      pie.innerHTML = "";
       const compartir = document.createElement("button");
-      compartir.className = "menu-item";
-      compartir.textContent = "📲 Compartir app";
+      compartir.className = "btn-compartir";
+      compartir.innerHTML = svgIcono(IC.compartir) + "<span>Compartir app</span>";
       compartir.onclick = async () => {
         const enlace = "https://rcp91918-beep.github.io/rcp-control-procesos/";
         const texto = "🔵🔴 ¡Entra a la app de RCP! Encuentra los materiales de tus 10 semestres, avisos, malla curricular y más. Compártela con tus compañeros 👇\n" + enlace;
@@ -376,7 +520,11 @@
           window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank", "noopener");
         }
       };
-      lista.appendChild(compartir);
+      pie.appendChild(compartir);
+      const ver = document.createElement("div");
+      ver.className = "menu-ver";
+      ver.textContent = "RCP · versión v18";
+      pie.appendChild(ver);
     }
 
     async function abrir(id, nombre, nivel) {
@@ -405,13 +553,57 @@
       return 99;
     }
 
+    function botonSemestre(c) {
+      const b = document.createElement("button");
+      b.className = "carpeta";
+      b.textContent = c.name.trim();
+      b.onclick = () => {
+        camino = [{ id: raiz.id, name: raiz.name }];
+        origenMenu = false;
+        abrir(c.id, c.name);
+      };
+      return b;
+    }
+
+    /* Pantalla principal: semestres agrupados por año (1-2 = 1.er año, 3-4 = 2.º año...) */
+    function dibujarSemestres(cont, carpetas) {
+      const num = carpetas.map(c => ({ c: c, n: parseInt((c.name.match(/\d+/) || [])[0], 10) }));
+      if (num.some(x => isNaN(x.n))) {
+        const g = document.createElement("div");
+        g.className = "lista";
+        carpetas.forEach(c => g.appendChild(botonSemestre(c)));
+        cont.appendChild(g);
+        return;
+      }
+      const porAnio = {};
+      num.forEach(x => { const a = Math.ceil(x.n / 2); (porAnio[a] = porAnio[a] || []).push(x.c); });
+      Object.keys(porAnio).map(Number).sort((a, b) => a - b).forEach(a => {
+        const bloque = document.createElement("div");
+        bloque.className = "anio";
+        const t = document.createElement("div");
+        t.className = "anio-titulo";
+        t.textContent = a === 1 ? "1.er año" : a + ".º año";
+        bloque.appendChild(t);
+        const g = document.createElement("div");
+        g.className = "lista";
+        porAnio[a].forEach(c => g.appendChild(botonSemestre(c)));
+        bloque.appendChild(g);
+        cont.appendChild(bloque);
+      });
+    }
+
     function dibujar(d, filtro) {
       const f = (filtro || "").toLowerCase();
       const carpetas = d.folders.filter(x => x.name.toLowerCase().includes(f)).sort((a, b) => ordenCarpeta(a.name) - ordenCarpeta(b.name));
       const archivos = d.files.filter(x => x.name.toLowerCase().includes(f));
 
       document.getElementById("titulo").innerText = d.name.trim();
-      document.getElementById("btnVolver").style.display = enInicio ? "none" : "inline-block";
+      document.getElementById("navFila").style.display = enInicio ? "none" : "flex";
+      document.getElementById("buscador").style.display = enInicio ? "none" : "block";
+      if (!enInicio) {
+        const av = document.getElementById("avisoDestacado");
+        av.style.display = "none";
+      }
 
       const ruta = document.getElementById("ruta");
       ruta.innerHTML = "";
@@ -428,21 +620,21 @@
       const cont = document.getElementById("contenido");
       cont.innerHTML = "";
 
-      if (carpetas.length) {
+      if (enInicio) {
+        if (carpetas.length) dibujarSemestres(cont, carpetas);
+      } else if (carpetas.length) {
+        const t = document.createElement("h3");
+        t.textContent = "Carpetas";
+        cont.appendChild(t);
         const g = document.createElement("div");
-        g.className = "grid";
+        g.className = "lista";
         carpetas.forEach(c => {
           const b = document.createElement("button");
-          b.className = "carpeta";
-          b.textContent = c.name.trim();
-          if (!enInicio && umbralNuevo !== null && (c.updated || 0) > umbralNuevo) b.appendChild(crearBadge("✓ Nuevo"));
-          b.onclick = () => {
-            if (enInicio) {
-              camino = [{ id: raiz.id, name: raiz.name }];
-              origenMenu = false;
-            }
-            abrir(c.id, c.name);
-          };
+          b.className = "fila";
+          b.innerHTML = '<span class="ico-carpeta">' + svgIcono(IC.carpeta) + '</span><span class="txt"></span><span class="trail">' + svgIcono(IC.der) + '</span>';
+          b.querySelector(".txt").textContent = c.name.trim();
+          if (umbralNuevo !== null && (c.updated || 0) > umbralNuevo) b.insertBefore(crearBadge("✓ Nuevo"), b.querySelector(".trail"));
+          b.onclick = () => abrir(c.id, c.name);
           g.appendChild(b);
         });
         cont.appendChild(g);
@@ -453,15 +645,21 @@
         t.textContent = "Archivos";
         cont.appendChild(t);
         const g = document.createElement("div");
-        g.className = "grid";
+        g.className = "lista";
         archivos.forEach(a => {
           const l = document.createElement("a");
-          l.className = "archivo";
+          l.className = "fila";
           l.href = a.url;
           l.target = "_blank";
           l.rel = "noopener";
           l.onclick = (ev) => { ev.preventDefault(); abrirVisor(a, archivos); };
-          l.textContent = "📄 " + a.name;
+          const tipo = tipoArchivo(a.name);
+          l.innerHTML = '<span class="ext"></span><span class="txt"><div class="nom"></div><div class="fec"></div></span>';
+          const ext = l.querySelector(".ext");
+          ext.textContent = tipo.etiqueta;
+          if (tipo.clase) ext.classList.add(tipo.clase);
+          l.querySelector(".nom").textContent = a.name;
+          l.querySelector(".fec").textContent = fechaCorta(a.updated || 0);
           if (umbralNuevo !== null && (a.updated || 0) > umbralNuevo) l.appendChild(crearBadge("✓ Nuevo"));
           g.appendChild(l);
         });
