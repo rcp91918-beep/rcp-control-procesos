@@ -84,7 +84,7 @@ function mostrarDebug() {
     box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
     document.body.insertBefore(box, document.body.firstChild);
   }
-  box.textContent = "VERSION v2.4\nCarpetas recibidas: " + raiz.folders.length +
+  box.textContent = "VERSION v2.5\nCarpetas recibidas: " + raiz.folders.length +
     "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
     (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
           "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -283,7 +283,7 @@ function armarMenu() {
   pie.appendChild(compartir);
   const ver = document.createElement("div");
   ver.className = "menu-ver";
-  ver.textContent = "RCP · versión v2.4";
+  ver.textContent = "RCP · versión v2.5";
   pie.appendChild(ver);
 }
 
@@ -439,6 +439,7 @@ function dibujar(d, filtro) {
       l.href = v.url;
       l.target = "_blank";
       l.rel = "noopener";
+      l.onclick = (ev) => { ev.preventDefault(); window.open(v.url, "_blank", "noopener"); };
       l.innerHTML = '<span class="ext pdf">' + svgIcono(IC.video).replace("<svg", '<svg width="20" height="20" fill="currentColor"') + '</span><span class="txt"><div class="nom"></div><div class="fec"></div></span><span class="trail">' + svgIcono(IC.externo) + '</span>';
       l.querySelector(".nom").textContent = v.materia;
       l.querySelector(".fec").textContent = v.docente;
