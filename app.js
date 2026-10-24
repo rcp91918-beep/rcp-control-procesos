@@ -12,6 +12,7 @@ const IC = {
   info: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7.5h.01",
   oferta: "M3 12V4h8l10 10-8 8zM7.5 8.5h.01",
   malla: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",
+  video: "M5 4l14 8-14 8z",
   carpeta: "M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
   archivo: "M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3v5h5",
   perfil: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c.8-4 4-6 8-6s7.2 2 8 6",
@@ -83,7 +84,7 @@ function mostrarDebug() {
     box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
     document.body.insertBefore(box, document.body.firstChild);
   }
-  box.textContent = "VERSION v2.3\nCarpetas recibidas: " + raiz.folders.length +
+  box.textContent = "VERSION v2.4\nCarpetas recibidas: " + raiz.folders.length +
     "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
     (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
           "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -282,7 +283,7 @@ function armarMenu() {
   pie.appendChild(compartir);
   const ver = document.createElement("div");
   ver.className = "menu-ver";
-  ver.textContent = "RCP · versión v2.3";
+  ver.textContent = "RCP · versión v2.4";
   pie.appendChild(ver);
 }
 
@@ -423,7 +424,30 @@ function dibujar(d, filtro) {
     cont.appendChild(g);
   }
 
-  if (!carpetas.length && !archivos.length) {
+  /* Videos de clases grabadas: solo dentro de un semestre que tenga links en videos.js */
+  const numSem = !enInicio && camino.length === 2 ? parseInt((d.name.match(/\d+/) || [])[0], 10) : NaN;
+  const videos = (VIDEOS[numSem] || []).filter(v => (v.materia + " " + v.docente).toLowerCase().includes(f));
+  if (videos.length) {
+    const t = document.createElement("h3");
+    t.textContent = "Videos de clases";
+    cont.appendChild(t);
+    const g = document.createElement("div");
+    g.className = "lista";
+    videos.forEach(v => {
+      const l = document.createElement("a");
+      l.className = "fila";
+      l.href = v.url;
+      l.target = "_blank";
+      l.rel = "noopener";
+      l.innerHTML = '<span class="ext pdf">' + svgIcono(IC.video).replace("<svg", '<svg width="20" height="20" fill="currentColor"') + '</span><span class="txt"><div class="nom"></div><div class="fec"></div></span><span class="trail">' + svgIcono(IC.externo) + '</span>';
+      l.querySelector(".nom").textContent = v.materia;
+      l.querySelector(".fec").textContent = v.docente;
+      g.appendChild(l);
+    });
+    cont.appendChild(g);
+  }
+
+  if (!carpetas.length && !archivos.length && !videos.length) {
     cont.innerHTML = '<p class="msg">' + (f ? "Sin resultados." : "Esta carpeta está vacía.") + "</p>";
   }
 }
