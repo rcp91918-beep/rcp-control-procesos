@@ -13,6 +13,7 @@ const IC = {
   oferta: "M3 12V4h8l10 10-8 8zM7.5 8.5h.01",
   malla: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",
   video: "M5 4l14 8-14 8z",
+  estrella: "M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z",
   carpeta: "M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
   archivo: "M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3v5h5",
   perfil: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c.8-4 4-6 8-6s7.2 2 8 6",
@@ -84,7 +85,7 @@ function mostrarDebug() {
     box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
     document.body.insertBefore(box, document.body.firstChild);
   }
-  box.textContent = "VERSION v2.5\nCarpetas recibidas: " + raiz.folders.length +
+  box.textContent = "VERSION v2.6\nCarpetas recibidas: " + raiz.folders.length +
     "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
     (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
           "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -283,11 +284,113 @@ function armarMenu() {
   pie.appendChild(compartir);
   const ver = document.createElement("div");
   ver.className = "menu-ver";
-  ver.textContent = "RCP · versión v2.5";
+  ver.textContent = "RCP · versión v2.6";
   pie.appendChild(ver);
 }
 
+/* FAVORITOS: se guardan en este celular (cada estudiante arma los suyos) */
+const FAV_KEY = "rcp_fav";
+function leerFav() {
+  try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch (e) { return []; }
+}
+function guardarFav(lista) {
+  try { localStorage.setItem(FAV_KEY, JSON.stringify(lista)); } catch (e) {}
+}
+const esFav = (id) => leerFav().some(f => f.id === id);
+function alternarFav(item) {
+  const lista = leerFav();
+  const i = lista.findIndex(f => f.id === item.id);
+  if (i >= 0) lista.splice(i, 1); else lista.push(item);
+  guardarFav(lista);
+  return i < 0;
+}
+/* estrellita tocable; no abre la fila donde está */
+function crearEstrella(item, alCambiar) {
+  const e = document.createElement("span");
+  e.setAttribute("role", "button");
+  e.tabIndex = 0;
+  const pintar = () => {
+    const on = esFav(item.id);
+    e.className = "estrella" + (on ? " on" : "");
+    e.setAttribute("aria-label", on ? "Quitar de favoritos" : "Agregar a favoritos");
+    e.innerHTML = svgIcono(IC.estrella);
+  };
+  pintar();
+  const accion = (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    alternarFav(item);
+    pintar();
+    if (alCambiar) alCambiar();
+  };
+  e.onclick = accion;
+  e.onkeydown = (ev) => { if (ev.key === "Enter" || ev.key === " ") accion(ev); };
+  return e;
+}
+const rutaTexto = (ruta) => ruta.slice(1).map(p => p.name.trim()).join(" › ");
+
+/* Pantalla de favoritos */
+function mostrarFavoritos() {
+  enInicio = false;
+  origenMenu = false;
+  camino = [{ id: raiz.id, name: raiz.name }, { id: "fav", name: "Favoritos" }];
+  actual = null;
+  document.getElementById("avisoDestacado").style.display = "none";
+  document.getElementById("titulo").innerText = "Favoritos";
+  document.getElementById("navFila").style.display = "flex";
+  document.getElementById("buscador").style.display = "none";
+  const ruta = document.getElementById("ruta");
+  ruta.innerHTML = "";
+  const a = document.createElement("a");
+  a.textContent = "Inicio";
+  a.onclick = irInicio;
+  ruta.appendChild(a);
+  ruta.insertAdjacentHTML("beforeend", "<span>›</span>");
+  const u = document.createElement("a");
+  u.textContent = "Favoritos";
+  ruta.appendChild(u);
+
+  const cont = document.getElementById("contenido");
+  cont.innerHTML = "";
+  const lista = leerFav();
+  if (!lista.length) {
+    cont.innerHTML = '<p class="msg">Aún no tienes favoritos. Toca la estrella ☆ en una materia o un archivo para guardarlo aquí.</p>';
+  } else {
+    const g = document.createElement("div");
+    g.className = "lista";
+    lista.forEach(f => {
+      const r = document.createElement(f.tipo === "c" ? "button" : "a");
+      r.className = "fila";
+      if (f.tipo === "c") {
+        r.innerHTML = '<span class="ico-carpeta">' + svgIcono(IC.carpeta) + '</span><span class="txt"><div class="nom"></div><div class="fec"></div></span>';
+        r.onclick = () => {
+          umbralNuevo = null;
+          camino = f.camino.slice();
+          abrir(f.id, f.name);
+        };
+      } else {
+        const tipo = tipoArchivo(f.name);
+        r.href = f.url;
+        r.target = "_blank";
+        r.rel = "noopener";
+        r.innerHTML = '<span class="ext"></span><span class="txt"><div class="nom"></div><div class="fec"></div></span>';
+        const ext = r.querySelector(".ext");
+        ext.textContent = tipo.etiqueta;
+        if (tipo.clase) ext.classList.add(tipo.clase);
+        r.onclick = (ev) => { ev.preventDefault(); abrirVisor(f, [f]); };
+      }
+      r.querySelector(".nom").textContent = f.name.trim();
+      r.querySelector(".fec").textContent = rutaTexto(f.camino);
+      r.appendChild(crearEstrella(f, mostrarFavoritos));
+      g.appendChild(r);
+    });
+    cont.appendChild(g);
+  }
+  registrarVista();
+}
+
 async function abrir(id, nombre, nivel) {
+  if (id === "fav") { mostrarFavoritos(); return; }
   const cont = document.getElementById("contenido");
   document.getElementById("buscador").value = "";
   cont.innerHTML = '<p class="msg">Cargando...</p>';
@@ -321,6 +424,11 @@ function dibujarSemestres(cont, carpetas) {
   try { actualId = localStorage.getItem(ACTUAL_KEY); } catch (e) {}
   const g = document.createElement("div");
   g.className = "sem-grid";
+  const bf = document.createElement("button");
+  bf.className = "sem-fav";
+  bf.innerHTML = svgIcono(IC.estrella) + "<span>Favoritos</span>";
+  bf.onclick = mostrarFavoritos;
+  g.appendChild(bf);
   carpetas.forEach(c => {
     const n = (c.name.match(/\d+/) || [""])[0];
     const b = document.createElement("button");
@@ -392,6 +500,7 @@ function dibujar(d, filtro) {
       b.innerHTML = '<span class="ico-carpeta">' + svgIcono(IC.carpeta) + '</span><span class="txt"></span><span class="trail">' + svgIcono(IC.der) + '</span>';
       b.querySelector(".txt").textContent = c.name.trim();
       if (origenMenu && umbralNuevo !== null && (c.updated || 0) > umbralNuevo) b.insertBefore(crearBadge("✓ Nuevo"), b.querySelector(".trail"));
+      b.insertBefore(crearEstrella({ tipo: "c", id: c.id, name: c.name, camino: camino.map(p => ({ id: p.id, name: p.name })) }), b.querySelector(".trail"));
       b.onclick = () => abrir(c.id, c.name);
       g.appendChild(b);
     });
@@ -419,6 +528,7 @@ function dibujar(d, filtro) {
       l.querySelector(".nom").textContent = a.name;
       l.querySelector(".fec").textContent = fechaCorta(a.updated || 0);
       if (origenMenu && umbralNuevo !== null && (a.updated || 0) > umbralNuevo) l.appendChild(crearBadge("✓ Nuevo"));
+      l.appendChild(crearEstrella({ tipo: "a", id: a.id, name: a.name, url: a.url, updated: a.updated || 0, camino: camino.map(p => ({ id: p.id, name: p.name })) }));
       g.appendChild(l);
     });
     cont.appendChild(g);
