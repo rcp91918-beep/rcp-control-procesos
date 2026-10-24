@@ -85,7 +85,7 @@ function mostrarDebug() {
     box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
     document.body.insertBefore(box, document.body.firstChild);
   }
-  box.textContent = "VERSION v2.6\nCarpetas recibidas: " + raiz.folders.length +
+  box.textContent = "VERSION v2.7\nCarpetas recibidas: " + raiz.folders.length +
     "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
     (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
           "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -284,7 +284,7 @@ function armarMenu() {
   pie.appendChild(compartir);
   const ver = document.createElement("div");
   ver.className = "menu-ver";
-  ver.textContent = "RCP · versión v2.6";
+  ver.textContent = "RCP · versión v2.7";
   pie.appendChild(ver);
 }
 
@@ -426,7 +426,8 @@ function dibujarSemestres(cont, carpetas) {
   g.className = "sem-grid";
   const bf = document.createElement("button");
   bf.className = "sem-fav";
-  bf.innerHTML = svgIcono(IC.estrella) + "<span>Favoritos</span>";
+  bf.innerHTML = svgIcono(IC.estrella) + "<span></span>";
+  bf.querySelector("span").textContent = "Favoritos (" + leerFav().length + ")";
   bf.onclick = mostrarFavoritos;
   g.appendChild(bf);
   carpetas.forEach(c => {
