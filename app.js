@@ -85,7 +85,7 @@ function mostrarDebug() {
     box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
     document.body.insertBefore(box, document.body.firstChild);
   }
-  box.textContent = "VERSION v2.9\nCarpetas recibidas: " + raiz.folders.length +
+  box.textContent = "VERSION v2.10\nCarpetas recibidas: " + raiz.folders.length +
     "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
     (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
           "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -287,7 +287,7 @@ function armarMenu() {
   pie.appendChild(compartir);
   const ver = document.createElement("div");
   ver.className = "menu-ver";
-  ver.textContent = "RCP · versión v2.9";
+  ver.textContent = "RCP · versión v2.10";
   pie.appendChild(ver);
 }
 

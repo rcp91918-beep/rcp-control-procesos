@@ -22,7 +22,7 @@
     b.className = "aviso-instalar";
     b.setAttribute("role", "region");
     b.setAttribute("aria-label", "Instalar la app");
-    b.innerHTML = '<img src="logo.png" alt="" class="ai-logo"><div class="ai-texto"><div class="ai-tit">Instala la app RCP</div><div class="ai-sub"></div></div>';
+    b.innerHTML = '<div class="ai-texto"><div class="ai-tit">Instala la app RCP</div><div class="ai-sub"></div></div>';
     const sub = b.querySelector(".ai-sub");
     if (android) {
       sub.innerHTML = 'Ábrela directo desde tu pantalla.<br>Si aparece una advertencia, toca <b>Instalar de todas formas</b>.';
