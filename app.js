@@ -85,7 +85,7 @@ function mostrarDebug() {
     box.style.cssText = "background:#111;color:#0f0;padding:12px;margin:0;font-size:13px;white-space:pre-wrap;position:relative;z-index:60;";
     document.body.insertBefore(box, document.body.firstChild);
   }
-  box.textContent = "VERSION v2.7\nCarpetas recibidas: " + raiz.folders.length +
+  box.textContent = "VERSION v2.8\nCarpetas recibidas: " + raiz.folders.length +
     "\nAVISOS: " + (av ? "encontrado" : "NO encontrado") +
     (av ? "\nlatest: " + av.latest + "\nupdated: " + av.updated +
           "\nvisto antes: " + (leerVisto()[av.id] || "nunca") +
@@ -102,7 +102,8 @@ let restaurando = false;
 let primeraVista = true;
 let origenMenu = false;  // true si la carpeta se abrió desde el menú de las tres rayitas
 let vistaPrevia = null;  // dónde estaba la persona antes de abrir esa carpeta del menú
-function vistaActual() { return { v: enInicio ? "i" : "c", camino: camino.slice(), m: origenMenu }; }
+let favBase = 0;  // si es mayor que 0, la carpeta se abrió desde Favoritos (largo del camino de esa carpeta)
+function vistaActual() { return { v: enInicio ? "i" : "c", camino: camino.slice(), m: origenMenu, fb: favBase }; }
 function registrarVista() {
   if (restaurando) return;
   const est = vistaActual();
@@ -119,6 +120,7 @@ function registrarVista() {
 /* PANTALLA PRINCIPAL: solo semestres; el resto va al menú */
 async function irInicio() {
   cerrarMenu();
+  favBase = 0;
   document.getElementById("buscador").value = "";
   document.getElementById("contenido").innerHTML = '<p class="msg">Cargando...</p>';
   try {
@@ -169,6 +171,7 @@ async function dibujarAviso() {
 let icpAbierto = false;
 function abrirCarpetaMenu(f) {
   cerrarMenu();
+  favBase = 0;
   const previo = leerVisto()[f.id];
   umbralNuevo = previo !== undefined ? previo : null;
   marcarVisto(f.id, fechaCarpeta(f));
@@ -284,7 +287,7 @@ function armarMenu() {
   pie.appendChild(compartir);
   const ver = document.createElement("div");
   ver.className = "menu-ver";
-  ver.textContent = "RCP · versión v2.7";
+  ver.textContent = "RCP · versión v2.8";
   pie.appendChild(ver);
 }
 
@@ -331,6 +334,7 @@ const rutaTexto = (ruta) => ruta.slice(1).map(p => p.name.trim()).join(" › ");
 
 /* Pantalla de favoritos */
 function mostrarFavoritos() {
+  favBase = 0;
   enInicio = false;
   origenMenu = false;
   camino = [{ id: raiz.id, name: raiz.name }, { id: "fav", name: "Favoritos" }];
@@ -366,6 +370,7 @@ function mostrarFavoritos() {
         r.onclick = () => {
           umbralNuevo = null;
           camino = f.camino.slice();
+          favBase = camino.length + 1;
           abrir(f.id, f.name);
         };
       } else {
@@ -398,6 +403,7 @@ async function abrir(id, nombre, nivel) {
     const d = await cargar(id);
     if (nivel === undefined) camino.push({ id: d.id, name: d.name });
     else camino = camino.slice(0, nivel + 1);
+    if (nivel !== undefined && camino.length < favBase) favBase = 0;
     enInicio = false;
     actual = d;
     dibujar(d);
@@ -446,6 +452,7 @@ function dibujarSemestres(cont, carpetas) {
       umbralNuevo = null;
       camino = [{ id: raiz.id, name: raiz.name }];
       origenMenu = false;
+      favBase = 0;
       abrir(c.id, c.name);
     };
     g.appendChild(b);
@@ -565,6 +572,7 @@ function dibujar(d, filtro) {
 }
 
 function volver() {
+  if (favBase && camino.length <= favBase) { mostrarFavoritos(); return; }
   if (camino.length > 2) {
     const anterior = camino[camino.length - 2];
     abrir(anterior.id, anterior.name, camino.length - 2);
@@ -742,6 +750,7 @@ window.addEventListener("popstate", async (ev) => {
       await abrir(ult.id, ult.name, camino.length - 1);
     }
     origenMenu = !!s.m;
+    favBase = s.fb || 0;
   } finally { restaurando = false; }
   if (veniaDeMenu && !s.m) abrirMenu();
 });
