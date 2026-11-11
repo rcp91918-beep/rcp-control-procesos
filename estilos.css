@@ -160,3 +160,8 @@ footer { margin-top: 50px; padding: 22px; text-align: center; background: var(--
 .ai-instalar { height: 40px; padding: 0 16px; border: none; border-radius: 12px; background: var(--azul); color: white; font-family: inherit; font-size: 14px; font-weight: 600; flex-shrink: 0; cursor: pointer; }
 .ai-instalar:hover { background: var(--rojo); }
 .ai-x { width: 40px; height: 40px; border: none; background: transparent; color: #5b6b8c; font-size: 26px; line-height: 1; flex-shrink: 0; cursor: pointer; }
+
+/* PORTADA (imagen al entrar) */
+#portada { position: fixed; inset: 0; z-index: 300; background: #fff; display: flex; align-items: center; justify-content: center; }
+#portada img { max-width: 94vw; max-height: 86vh; width: auto; height: auto; object-fit: contain; }
+#portadaX { position: absolute; top: 14px; right: 14px; width: 44px; height: 44px; border: none; border-radius: 50%; background: var(--azul-oscuro); color: white; font-size: 30px; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
