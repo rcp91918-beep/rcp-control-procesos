@@ -3,24 +3,32 @@ const HOR_KEY = "rcp_horario";
 const DIAS_H = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 const DIAS_L = ["L", "M", "M", "J", "V", "S"];
 const COLORES_H = ["#123b8f", "#0f6b6b", "#5b3fa8", "#b4570a", "#d71920", "#2e7d32", "#c2185b", "#455a64", "#0288d1", "#6d4c41", "#827717", "#00897b", "#ef6c00", "#7b1fa2", "#00838f"];
-const PX_MIN = 0.8; // alto en pantalla por minuto
-/* períodos de clase de 45 minutos: 07:00 a 22:45 */
-const PERIODOS = Array.from({ length: 20 }, (_, i) => [420 + i * 45, 465 + i * 45]);
+const BASE_MIN = 420; // 07:00
+const PASO = 45;      // períodos de 45 minutos
+const PERIODOS = Array.from({ length: 20 }, (_, i) => [BASE_MIN + i * PASO, BASE_MIN + (i + 1) * PASO]);
+const LW = 32;        // ancho de la columna de horas
 
-const leerHor = () => { try { return JSON.parse(localStorage.getItem(HOR_KEY)) || []; } catch (e) { return []; } };
-const guardarHor = (l) => { try { localStorage.setItem(HOR_KEY, JSON.stringify(l)); } catch (e) {} };
 const hhmm = (m) => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
 const aMin = (t) => { const p = t.split(":"); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); };
 
-function abrirHorarios() {
-  cerrarMenu();
-  favBase = 0;
-  if (!origenMenu) vistaPrevia = vistaActual();
-  origenMenu = true;
-  camino = [{ id: raiz.id, name: raiz.name }];
-  mostrarHorarios();
-  armarMenu();
+/* quita el código (ICP 326 -) y la letra de grupo (- T) del nombre de la materia */
+function limpiarNombre(n) {
+  let s = String(n || "").trim();
+  s = s.replace(/^[A-Z]{2,4}[\s-]?\d{2,4}[A-Za-z]?\s*[-–—.:)]*\s*/, "");
+  s = s.replace(/\s*[-–—(]\s*[TPLI]\d?\)?\s*$/, "").replace(/\s+T$/, "");
+  return s.trim() || String(n || "").trim();
 }
+
+/* cada materia: { id, tipo:"c"|"a", nombre, corto, color, sesiones:[{dias, ini, fin, aula}] } */
+function leerHor() {
+  let l = [];
+  try { l = JSON.parse(localStorage.getItem(HOR_KEY)) || []; } catch (e) {}
+  return l.map(x => x.sesiones ? x : {
+    id: x.id, tipo: x.tipo, nombre: x.nombre, corto: "", color: x.color,
+    sesiones: [{ dias: x.dias || [], ini: x.ini, fin: x.fin, aula: x.aula || "" }]
+  });
+}
+const guardarHor = (l) => { try { localStorage.setItem(HOR_KEY, JSON.stringify(l)); } catch (e) {} };
 
 /* pestañas de la pantalla principal: Semestres | Mis horarios */
 function crearPestanas(activa) {
@@ -39,6 +47,16 @@ function crearPestanas(activa) {
     t.appendChild(b);
   });
   return t;
+}
+
+function abrirHorarios() {
+  cerrarMenu();
+  favBase = 0;
+  if (!origenMenu) vistaPrevia = vistaActual();
+  origenMenu = true;
+  camino = [{ id: raiz.id, name: raiz.name }];
+  mostrarHorarios();
+  armarMenu();
 }
 
 function mostrarHorarios() {
@@ -68,83 +86,99 @@ function dibujarHorario() {
   const cont = document.getElementById("contenido");
   cont.innerHTML = "";
   if (enInicio) { document.getElementById("avisoDestacado").style.display = "none"; cont.appendChild(crearPestanas(1)); }
-  const lista = leerHor();
-  if (!lista.length) {
-    cont.insertAdjacentHTML("beforeend", '<p class="hor-vacio">Aún no tienes materias en tu horario. Toca el botón rojo para agregar la primera.</p>');
-  } else {
-    let min = 420, max = 780;
-    lista.forEach(b => { min = Math.min(min, Math.floor(b.ini / 60) * 60); max = Math.max(max, Math.ceil(b.fin / 60) * 60); });
-    const alto = (max - min) * PX_MIN;
-    const g = document.createElement("div");
-    g.className = "hor-grid";
-    g.appendChild(document.createElement("div"));
-    DIAS_H.forEach(d => { const e = document.createElement("div"); e.className = "hor-dia"; e.textContent = d; g.appendChild(e); });
-    const col0 = document.createElement("div");
-    col0.className = "hor-horas";
-    col0.style.height = alto + "px";
-    for (let m = min; m <= max; m += 60) {
-      const s = document.createElement("span");
-      s.style.top = (m - min) * PX_MIN + "px";
-      s.textContent = hhmm(m);
-      col0.appendChild(s);
-    }
-    g.appendChild(col0);
-    for (let d = 0; d < 6; d++) {
-      const col = document.createElement("div");
-      col.className = "hor-col";
-      col.style.height = alto + "px";
-      for (let m = min; m <= max; m += 60) {
-        const l = document.createElement("div");
-        l.className = "hor-linea";
-        l.style.top = (m - min) * PX_MIN + "px";
-        col.appendChild(l);
-      }
-      /* bloques del día; si dos se cruzan, se reparten el ancho */
-      const del = lista.filter(b => b.dias.indexOf(d) >= 0).sort((x, y) => x.ini - y.ini || x.fin - y.fin);
-      const carriles = [];
-      del.forEach(b => {
-        let c = carriles.findIndex(fin => fin <= b.ini);
-        if (c < 0) { c = carriles.length; carriles.push(0); }
-        carriles[c] = b.fin;
-        b._c = c;
-      });
-      del.forEach(b => {
-        /* cuántos carriles hay en el grupo que cruza con este bloque */
-        const cruza = del.filter(o => o.ini < b.fin && o.fin > b.ini);
-        const n = Math.max.apply(null, cruza.map(o => o._c)) + 1;
-        const e = document.createElement("button");
-        e.className = "hor-bloque" + (b.tipo === "a" ? " aux" : "");
-        e.style.background = b.color;
-        e.style.top = (b.ini - min) * PX_MIN + "px";
-        e.style.height = (b.fin - b.ini) * PX_MIN - 1 + "px";
-        e.style.left = (b._c * 100 / n) + "%";
-        e.style.width = (100 / n) + "%";
-        const t = document.createElement("b");
-        t.textContent = (b.tipo === "a" ? "Aux. " : "") + b.nombre;
-        e.appendChild(t);
-        const h = document.createElement("i");
-        h.textContent = hhmm(b.ini) + "–" + hhmm(b.fin);
-        e.appendChild(h);
-        if (b.aula) { const au = document.createElement("i"); au.textContent = b.aula; e.appendChild(au); }
-        e.onclick = () => formHorario(b);
-        col.appendChild(e);
-      });
-      g.appendChild(col);
-    }
-    cont.appendChild(g);
-  }
   const btn = document.createElement("button");
   btn.className = "hor-btn";
   btn.textContent = "+ Agregar materia";
   btn.onclick = () => formHorario(null);
   cont.appendChild(btn);
-  const nota = document.createElement("p");
-  nota.className = "hor-nota";
-  nota.textContent = "Tu horario se guarda solo en este celular. Toca una materia para editarla o borrarla.";
-  cont.appendChild(nota);
+
+  const lista = leerHor();
+  if (!lista.length) {
+    cont.insertAdjacentHTML("beforeend", '<p class="hor-vacio">Aún no tienes materias en tu horario. Toca el botón rojo para agregar la primera.</p>');
+    return;
+  }
+
+  /* bloques sueltos: una materia puede tener varios horarios */
+  const bl = [];
+  lista.forEach(m => m.sesiones.forEach(s => s.dias.forEach(d => bl.push({ m: m, s: s, d: d }))));
+  let mn = Infinity, mx = -Infinity;
+  bl.forEach(b => { mn = Math.min(mn, b.s.ini); mx = Math.max(mx, b.s.fin); });
+  const r0 = Math.min(0, Math.floor((mn - BASE_MIN) / PASO));
+  const r1 = Math.max(Math.ceil((mx - BASE_MIN) / PASO), r0 + 6);
+  const n = r1 - r0;
+  const ini0 = BASE_MIN + r0 * PASO;
+
+  const g = document.createElement("div");
+  g.className = "hg";
+  cont.appendChild(g);
+  /* alto de cada fila: que todo entre en la pantalla sin desplazar */
+  const libre = window.innerHeight - g.getBoundingClientRect().top - 36;
+  const H = Math.max(26, Math.min(46, Math.floor((libre - 22) / n)));
+  g.style.height = (n * H + 22) + "px";
+
+  const col = (d) => "calc(" + LW + "px + (100% - " + LW + "px) * " + d + " / 6)";
+  const ancho = "calc((100% - " + LW + "px) / 6 - 2px)";
+  DIAS_H.forEach((x, d) => {
+    const e = document.createElement("div");
+    e.className = "hg-dia";
+    e.style.left = col(d);
+    e.style.width = "calc((100% - " + LW + "px) / 6)";
+    e.textContent = x;
+    g.appendChild(e);
+  });
+  const cuerpo = document.createElement("div");
+  cuerpo.className = "hg-cuerpo";
+  cuerpo.style.height = n * H + "px";
+  g.appendChild(cuerpo);
+  for (let i = 0; i < n; i++) {
+    const f = document.createElement("div");
+    f.className = "hg-fila";
+    f.style.top = i * H + "px";
+    f.style.height = H + "px";
+    const a = ini0 + i * PASO;
+    f.innerHTML = "<span>" + hhmm(a) + "<br>" + hhmm(a + PASO) + "</span>";
+    cuerpo.appendChild(f);
+  }
+  for (let d = 0; d <= 6; d++) {
+    const v = document.createElement("div");
+    v.className = "hg-vert";
+    v.style.left = col(d);
+    cuerpo.appendChild(v);
+  }
+
+  /* bloques; si dos se cruzan en el mismo día, se reparten el ancho */
+  for (let d = 0; d < 6; d++) {
+    const del = bl.filter(b => b.d === d).sort((x, y) => x.s.ini - y.s.ini || x.s.fin - y.s.fin);
+    const carriles = [];
+    del.forEach(b => {
+      let c = carriles.findIndex(fin => fin <= b.s.ini);
+      if (c < 0) { c = carriles.length; carriles.push(0); }
+      carriles[c] = b.s.fin;
+      b.c = c;
+    });
+    del.forEach(b => {
+      const cruza = del.filter(o => o.s.ini < b.s.fin && o.s.fin > b.s.ini);
+      const k = Math.max.apply(null, cruza.map(o => o.c)) + 1;
+      const h = (b.s.fin - b.s.ini) / PASO * H - 2;
+      const e = document.createElement("button");
+      e.className = "hg-bloque";
+      e.style.background = b.m.color;
+      e.style.top = ((b.s.ini - ini0) / PASO * H + 1) + "px";
+      e.style.height = h + "px";
+      e.style.left = "calc(" + col(d) + " + 1px + (" + ancho + " + 2px) * " + b.c + " / " + k + ")";
+      e.style.width = "calc((" + ancho + " + 2px) / " + k + " - 2px)";
+      const t = document.createElement("b");
+      t.textContent = (b.m.tipo === "a" ? "Aux. " : "") + (b.m.corto || b.m.nombre);
+      e.appendChild(t);
+      if (h >= 40) { const i1 = document.createElement("i"); i1.textContent = hhmm(b.s.ini) + "–" + hhmm(b.s.fin); e.appendChild(i1); }
+      if (b.s.aula && h >= 54) { const i2 = document.createElement("i"); i2.textContent = b.s.aula; e.appendChild(i2); }
+      e.onclick = () => formHorario(b.m);
+      cuerpo.appendChild(e);
+    });
+  }
 }
 
-/* lista de materias de la app (de los semestres ya cargados) */
+/* lista de materias de la app (de los semestres), con el nombre limpio */
 let MATERIAS_H = null;
 async function materiasHorario() {
   if (MATERIAS_H) return MATERIAS_H;
@@ -154,7 +188,7 @@ async function materiasHorario() {
     for (const s of sems) {
       try {
         const d = await cargar(s.id);
-        out.push({ sem: s.name.trim(), mats: d.folders.map(f => f.name.trim()) });
+        out.push({ sem: s.name.trim(), mats: d.folders.map(f => limpiarNombre(f.name)) });
       } catch (e) { /* ese semestre aún no está disponible */ }
     }
   } catch (e) {}
@@ -167,9 +201,11 @@ async function formHorario(ed) {
   if (viejo) viejo.remove();
   const sems = await materiasHorario();
   let tipo = ed ? ed.tipo : "c";
-  let dias = ed ? ed.dias.slice() : [];
-  const colorDe = (n) => { const l = leerHor().find(x => x.nombre === n); return l ? l.color : COLORES_H[leerHor().length % COLORES_H.length]; };
-  let color = ed ? ed.color : colorDe("");
+  let color = ed ? ed.color : null;
+  const ses = ed
+    ? ed.sesiones.map(s => ({ dias: s.dias.slice(), ini: s.ini, fin: s.fin, aula: s.aula || "" }))
+    : [{ dias: [], ini: PERIODOS[0][0], fin: PERIODOS[0][1], aula: "" }];
+  const colorDe = (n) => { const l = leerHor(); const x = l.find(y => y.nombre === n); return x ? x.color : COLORES_H[l.length % COLORES_H.length]; };
 
   const fondo = document.createElement("div");
   fondo.id = "formHor";
@@ -190,7 +226,6 @@ async function formHorario(ed) {
 
   hoja.appendChild(mk("label", "", "Materia"));
   const sel = document.createElement("select");
-  sel.id = "hMat";
   sems.forEach(s => {
     const g = document.createElement("optgroup");
     g.label = s.sem;
@@ -202,65 +237,30 @@ async function formHorario(ed) {
   sel.appendChild(oo);
   hoja.appendChild(sel);
   const otra = document.createElement("input");
-  otra.type = "text"; otra.id = "hOtra"; otra.placeholder = "Nombre de la materia"; otra.maxLength = 40;
+  otra.type = "text"; otra.placeholder = "Nombre de la materia"; otra.maxLength = 40;
   otra.style.marginTop = "8px";
   hoja.appendChild(otra);
   const verOtra = () => { otra.style.display = sel.value === "__otra" ? "block" : "none"; };
-  sel.onchange = () => { verOtra(); if (!ed && sel.value !== "__otra") { color = colorDe(sel.value); pintar(); } };
   if (ed) {
     const existe = Array.prototype.some.call(sel.options, o => o.value === ed.nombre);
     sel.value = existe ? ed.nombre : "__otra";
     if (!existe) otra.value = ed.nombre;
   }
   verOtra();
-  if (!ed && sel.value !== "__otra") color = colorDe(sel.value);
+  if (!color) color = colorDe(sel.value === "__otra" ? "" : sel.value);
+  sel.onchange = () => { verOtra(); if (!ed && sel.value !== "__otra") { color = colorDe(sel.value); pintar(); } };
 
-  hoja.appendChild(mk("label", "", "Días"));
-  const fDias = mk("div", "hor-dias");
-  const bDias = DIAS_L.map((l, i) => {
-    const b = mk("button", "", l); b.type = "button";
-    b.setAttribute("aria-label", DIAS_H[i]);
-    b.onclick = () => { const k = dias.indexOf(i); if (k >= 0) dias.splice(k, 1); else dias.push(i); pintar(); };
-    fDias.appendChild(b);
-    return b;
-  });
-  hoja.appendChild(fDias);
+  hoja.appendChild(mk("label", "", "Nombre corto (opcional)"));
+  const corto = document.createElement("input");
+  corto.type = "text"; corto.maxLength = 14; corto.placeholder = "Ej: Op. Unitarias"; corto.value = ed ? (ed.corto || "") : "";
+  hoja.appendChild(corto);
 
-  /* horas: clase = lista de períodos; auxiliatura = hora escrita con el reloj */
-  const bloqueClase = mk("div"), bloqueAux = mk("div");
-  const par1 = mk("div", "hor-par");
-  const d1 = mk("div"), d2 = mk("div");
-  d1.appendChild(mk("label", "", "Desde")); d2.appendChild(mk("label", "", "Hasta"));
-  const sDesde = document.createElement("select"), sHasta = document.createElement("select");
-  PERIODOS.forEach((p, i) => {
-    const o1 = document.createElement("option"); o1.value = p[0]; o1.textContent = hhmm(p[0]); sDesde.appendChild(o1);
-    const o2 = document.createElement("option"); o2.value = p[1]; o2.textContent = hhmm(p[1]); sHasta.appendChild(o2);
-  });
-  d1.appendChild(sDesde); d2.appendChild(sHasta);
-  par1.appendChild(d1); par1.appendChild(d2);
-  bloqueClase.appendChild(par1);
-  sDesde.onchange = () => { if (+sHasta.value <= +sDesde.value) { const p = PERIODOS.find(x => x[0] === +sDesde.value); sHasta.value = p[1]; } };
-
-  const par2 = mk("div", "hor-par");
-  const e1 = mk("div"), e2 = mk("div");
-  e1.appendChild(mk("label", "", "Desde")); e2.appendChild(mk("label", "", "Hasta"));
-  const tDesde = document.createElement("input"), tHasta = document.createElement("input");
-  tDesde.type = tHasta.type = "time";
-  e1.appendChild(tDesde); e2.appendChild(tHasta);
-  par2.appendChild(e1); par2.appendChild(e2);
-  bloqueAux.appendChild(par2);
-  hoja.appendChild(bloqueClase); hoja.appendChild(bloqueAux);
-
-  if (ed) {
-    if (ed.tipo === "c") {
-      sDesde.value = ed.ini; sHasta.value = ed.fin;
-    } else { tDesde.value = hhmm(ed.ini); tHasta.value = hhmm(ed.fin); }
-  } else { sHasta.value = PERIODOS[0][1]; }
-
-  hoja.appendChild(mk("label", "", "Aula (opcional)"));
-  const aula = document.createElement("input");
-  aula.type = "text"; aula.maxLength = 20; aula.placeholder = "Ej: Aula 12"; aula.value = ed ? (ed.aula || "") : "";
-  hoja.appendChild(aula);
+  const zonaSes = mk("div");
+  hoja.appendChild(zonaSes);
+  const bMas = mk("button", "hor-mas", "+ Otro horario");
+  bMas.type = "button";
+  bMas.onclick = () => { ses.push({ dias: [], ini: PERIODOS[0][0], fin: PERIODOS[0][1], aula: "" }); pintarSes(); };
+  hoja.appendChild(bMas);
 
   hoja.appendChild(mk("label", "", "Color"));
   const fCol = mk("div", "hor-colores");
@@ -286,29 +286,86 @@ async function formHorario(ed) {
   acc.appendChild(bCan); acc.appendChild(bGu);
   hoja.appendChild(acc);
 
+  /* un bloque por cada horario de la materia */
+  function pintarSes() {
+    zonaSes.innerHTML = "";
+    ses.forEach((s, i) => {
+      const box = mk("div", "hor-ses");
+      if (ses.length > 1) {
+        const top = mk("div", "hor-ses-top");
+        top.appendChild(mk("span", "", "Horario " + (i + 1)));
+        const q = mk("button", "", "Quitar"); q.type = "button";
+        q.onclick = () => { ses.splice(i, 1); pintarSes(); };
+        top.appendChild(q);
+        box.appendChild(top);
+      }
+      box.appendChild(mk("label", "", "Días"));
+      const fd = mk("div", "hor-dias");
+      DIAS_L.forEach((l, k) => {
+        const b = mk("button", s.dias.indexOf(k) >= 0 ? "on" : "", l); b.type = "button";
+        b.setAttribute("aria-label", DIAS_H[k]);
+        b.onclick = () => { const p = s.dias.indexOf(k); if (p >= 0) s.dias.splice(p, 1); else s.dias.push(k); b.classList.toggle("on"); };
+        fd.appendChild(b);
+      });
+      box.appendChild(fd);
+      const par = mk("div", "hor-par");
+      const d1 = mk("div"), d2 = mk("div");
+      d1.appendChild(mk("label", "", "Desde")); d2.appendChild(mk("label", "", "Hasta"));
+      if (tipo === "c") {
+        const sd = document.createElement("select"), sh = document.createElement("select");
+        PERIODOS.forEach(p => {
+          const o1 = document.createElement("option"); o1.value = p[0]; o1.textContent = hhmm(p[0]); sd.appendChild(o1);
+          const o2 = document.createElement("option"); o2.value = p[1]; o2.textContent = hhmm(p[1]); sh.appendChild(o2);
+        });
+        if (!PERIODOS.some(p => p[0] === s.ini)) { s.ini = PERIODOS[0][0]; s.fin = PERIODOS[0][1]; }
+        if (!PERIODOS.some(p => p[1] === s.fin)) s.fin = s.ini + PASO;
+        sd.value = s.ini; sh.value = s.fin;
+        sd.onchange = () => { s.ini = +sd.value; if (s.fin <= s.ini) { s.fin = s.ini + PASO; sh.value = s.fin; } };
+        sh.onchange = () => { s.fin = +sh.value; };
+        d1.appendChild(sd); d2.appendChild(sh);
+      } else {
+        const t1 = document.createElement("input"), t2 = document.createElement("input");
+        t1.type = t2.type = "time";
+        if (!s.manual && !ed) { s.ini = null; s.fin = null; }
+        t1.value = s.ini != null ? hhmm(s.ini) : "";
+        t2.value = s.fin != null ? hhmm(s.fin) : "";
+        t1.onchange = () => { s.manual = true; s.ini = t1.value ? aMin(t1.value) : null; };
+        t2.onchange = () => { s.manual = true; s.fin = t2.value ? aMin(t2.value) : null; };
+        d1.appendChild(t1); d2.appendChild(t2);
+      }
+      par.appendChild(d1); par.appendChild(d2);
+      box.appendChild(par);
+      box.appendChild(mk("label", "", "Aula (opcional)"));
+      const au = document.createElement("input");
+      au.type = "text"; au.maxLength = 20; au.placeholder = "Ej: Aula 12"; au.value = s.aula || "";
+      au.oninput = () => { s.aula = au.value; };
+      box.appendChild(au);
+      zonaSes.appendChild(box);
+    });
+  }
+
   function pintar() {
     bC.classList.toggle("on", tipo === "c");
     bA.classList.toggle("on", tipo === "a");
-    bloqueClase.style.display = tipo === "c" ? "block" : "none";
-    bloqueAux.style.display = tipo === "a" ? "block" : "none";
-    bDias.forEach((b, i) => b.classList.toggle("on", dias.indexOf(i) >= 0));
     bCols.forEach((b, i) => b.classList.toggle("on", COLORES_H[i] === color));
   }
-  bC.onclick = () => { tipo = "c"; pintar(); };
-  bA.onclick = () => { tipo = "a"; pintar(); };
+  bC.onclick = () => { tipo = "c"; pintar(); pintarSes(); };
+  bA.onclick = () => { tipo = "a"; pintar(); pintarSes(); };
 
   bGu.onclick = () => {
     const nombre = (sel.value === "__otra" ? otra.value : sel.value).trim();
-    let ini, fin;
-    if (tipo === "c") { ini = +sDesde.value; fin = +sHasta.value; }
-    else {
-      if (!tDesde.value || !tHasta.value) { err.textContent = "Pon la hora de inicio y de fin."; return; }
-      ini = aMin(tDesde.value); fin = aMin(tHasta.value);
-    }
     if (!nombre) { err.textContent = "Escribe el nombre de la materia."; return; }
-    if (!dias.length) { err.textContent = "Marca al menos un día."; return; }
-    if (fin <= ini) { err.textContent = "La hora de fin debe ser después de la de inicio."; return; }
-    const reg = { id: ed ? ed.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 5), tipo: tipo, nombre: nombre, dias: dias.slice().sort(), ini: ini, fin: fin, aula: aula.value.trim(), color: color };
+    for (let i = 0; i < ses.length; i++) {
+      const s = ses[i], q = ses.length > 1 ? " (horario " + (i + 1) + ")" : "";
+      if (!s.dias.length) { err.textContent = "Marca al menos un día" + q + "."; return; }
+      if (s.ini == null || s.fin == null) { err.textContent = "Pon la hora de inicio y de fin" + q + "."; return; }
+      if (s.fin <= s.ini) { err.textContent = "La hora de fin debe ser después de la de inicio" + q + "."; return; }
+    }
+    const reg = {
+      id: ed ? ed.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+      tipo: tipo, nombre: nombre, corto: corto.value.trim(), color: color,
+      sesiones: ses.map(s => ({ dias: s.dias.slice().sort(), ini: s.ini, fin: s.fin, aula: (s.aula || "").trim() }))
+    };
     const l = leerHor().filter(x => x.id !== reg.id);
     l.push(reg);
     guardarHor(l);
@@ -317,5 +374,6 @@ async function formHorario(ed) {
   };
 
   pintar();
+  pintarSes();
   document.body.appendChild(fondo);
 }

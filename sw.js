@@ -1,4 +1,4 @@
-const CACHE = "rcp-v3.2";
+const CACHE = "rcp-v3.3";
 const ARCHIVOS = ["./", "index.html", "estilos.css", "api.js", "videos.js", "app.js", "horarios.js", "instalar.js", "portada.js", "portada.jpg", "logo.png", "manifest.json"];
 
 self.addEventListener("install", (e) => {

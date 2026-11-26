@@ -291,7 +291,7 @@ function armarMenu() {
   pie.appendChild(compartir);
   const ver = document.createElement("div");
   ver.className = "menu-ver";
-  ver.textContent = "RCP · versión v3.2";
+  ver.textContent = "RCP · versión v3.3";
   pie.appendChild(ver);
 }
 
