@@ -390,6 +390,28 @@ async function formHorario(ed) {
       if (s.ini == null || s.fin == null) { err.textContent = "Pon la hora de inicio y de fin" + q + "."; return; }
       if (s.fin <= s.ini) { err.textContent = "La hora de fin debe ser después de la de inicio" + q + "."; return; }
     }
+    /* no se permite encimar horarios: mismo día y horas que se cruzan (pegados, como 7-8 y 8-9, sí se puede) */
+    const otras = leerHor().filter(x => !ed || x.id !== ed.id);
+    const cruce = (a, b) => a.ini < b.fin && a.fin > b.ini;
+    for (let i = 0; i < ses.length; i++) {
+      const s = ses[i];
+      for (let j = i + 1; j < ses.length; j++) {
+        const d = s.dias.find(x => ses[j].dias.indexOf(x) >= 0);
+        if (d !== undefined && cruce(s, ses[j])) {
+          err.textContent = "Los horarios " + (i + 1) + " y " + (j + 1) + " se cruzan el " + DIAS_H[d] + ".";
+          return;
+        }
+      }
+      for (const m of otras) {
+        for (const o of m.sesiones) {
+          const d = s.dias.find(x => o.dias.indexOf(x) >= 0);
+          if (d !== undefined && cruce(s, o)) {
+            err.textContent = "El " + DIAS_H[d] + " se cruza con " + (m.corto || m.nombre) + " (" + hhmm(o.ini) + " a " + hhmm(o.fin) + "). Cambia el día o la hora.";
+            return;
+          }
+        }
+      }
+    }
     const reg = {
       id: ed ? ed.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
       tipo: tipo, nombre: nombre.trim(), corto: corto.value.trim(), color: color,
