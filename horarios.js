@@ -6,7 +6,8 @@ const COLORES_H = ["#123b8f", "#0f6b6b", "#5b3fa8", "#b4570a", "#d71920", "#2e7d
 const BASE_MIN = 420; // 07:00
 const PASO = 45;      // períodos de 45 minutos
 const PERIODOS = Array.from({ length: 20 }, (_, i) => [BASE_MIN + i * PASO, BASE_MIN + (i + 1) * PASO]);
-const LW = 32;        // ancho de la columna de horas
+let LW = 32;          // ancho de la columna de horas (se ajusta al ancho de la pantalla)
+let _hw = 0, _ht = null; // para redibujar al girar o cambiar el tamaño de la ventana
 
 const hhmm = (m) => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
 const aMin = (t) => { const p = t.split(":"); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); };
@@ -111,9 +112,17 @@ function dibujarHorario() {
   const g = document.createElement("div");
   g.className = "hg";
   cont.appendChild(g);
+  /* se adapta al ancho: teléfono, tableta o computadora */
+  const ancho0 = g.getBoundingClientRect().width || window.innerWidth;
+  _hw = window.innerWidth;
+  LW = ancho0 >= 700 ? 48 : 32;
+  const fs = Math.max(8, Math.min(14, Math.round(((ancho0 - LW) / 6) / 8))); // letra de los recuadros
+  g.style.setProperty("--hf", fs + "px");
+  g.style.setProperty("--hl", Math.max(8, Math.min(12, fs - 2)) + "px");
+  g.style.setProperty("--hd", Math.max(11, Math.min(15, fs + 2)) + "px");
   /* alto de cada fila: que todo entre en la pantalla sin desplazar */
   const libre = window.innerHeight - g.getBoundingClientRect().top - 36;
-  const H = Math.max(26, Math.min(46, Math.floor((libre - 22) / n)));
+  const H = Math.max(26, Math.min(ancho0 >= 700 ? 60 : 46, Math.floor((libre - 22) / n)));
   g.style.height = (n * H + 22) + "px";
 
   const col = (d) => "calc(" + LW + "px + (100% - " + LW + "px) * " + d + " / 6)";
@@ -137,6 +146,7 @@ function dibujarHorario() {
     f.style.height = H + "px";
     const a = ini0 + i * PASO;
     f.innerHTML = "<span>" + hhmm(a) + "<br>" + hhmm(a + PASO) + "</span>";
+    f.firstChild.style.width = LW + "px";
     cuerpo.appendChild(f);
   }
   for (let d = 0; d <= 6; d++) {
@@ -170,31 +180,28 @@ function dibujarHorario() {
       const t = document.createElement("b");
       t.textContent = (b.m.tipo === "a" ? "Aux. " : "") + (b.m.corto || b.m.nombre);
       e.appendChild(t);
-      if (h >= 40) { const i1 = document.createElement("i"); i1.textContent = hhmm(b.s.ini) + "–" + hhmm(b.s.fin); e.appendChild(i1); }
-      if (b.s.aula && h >= 54) { const i2 = document.createElement("i"); i2.textContent = b.s.aula; e.appendChild(i2); }
+      if (b.s.aula && h >= fs * 4.2) { const i2 = document.createElement("i"); i2.textContent = b.s.aula; e.appendChild(i2); }
       e.onclick = () => formHorario(b.m);
       cuerpo.appendChild(e);
     });
   }
 }
 
-/* lista de materias de la app (de los semestres), con el nombre limpio */
-let MATERIAS_H = null;
-async function materiasHorario() {
-  if (MATERIAS_H) return MATERIAS_H;
-  const out = [];
-  try {
-    const sems = raiz.folders.filter(f => esSemestre(f.name));
-    for (const s of sems) {
-      try {
-        const d = await cargar(s.id);
-        out.push({ sem: s.name.trim(), mats: d.folders.map(f => limpiarNombre(f.name)) });
-      } catch (e) { /* ese semestre aún no está disponible */ }
-    }
-  } catch (e) {}
-  if (out.length) MATERIAS_H = out;
-  return out;
-}
+/* materias por semestre, con nombres cortos (lista fija) */
+const SEMESTRES_H = [
+  { sem: "Semestre 1", mats: ["Física 1", "Álgebra 1", "Cálculo 1", "Dibujo Técnico", "Química General"] },
+  { sem: "Semestre 2", mats: ["Física 2", "Metodología 1", "Cálculo 2", "Álgebra 2", "Inorgánica"] },
+  { sem: "Semestre 3", mats: ["Orgánica 1", "Física 3", "Informática 1", "Ecuaciones", "Analítica"] },
+  { sem: "Semestre 4", mats: ["Orgánica 2", "Físico-Química", "Agua", "Microbiología", "OPE-1"] },
+  { sem: "Semestre 5", mats: ["Estadística", "Metodología 2", "Numérico", "Termodinámica", "Instrumental"] },
+  { sem: "Semestre 6", mats: ["Aplicada", "OPE-2", "Tecno", "Calidad", "Azúcar"] },
+  { sem: "Semestre 7", mats: ["Lácteos", "Aceite", "Instrumentación 1", "Gestión", "Higiene"] },
+  { sem: "Semestre 8", mats: ["Separación", "Analógicos", "Electrotecnia", "Análisis de Sistemas", "Economía"] },
+  { sem: "Semestre 9", mats: ["Inglés", "Hidrocarburos", "Cemento", "Reacciones", "Instrumentación 2"] },
+  { sem: "Semestre 10", mats: ["PLC", "Proyectos", "Maderas", "Sustancias", "Planificación"] },
+  { sem: "Semestre 11", mats: ["Legislación", "Scada", "Producción", "Investigación en Control", "Gas y Petróleo", "Diseño de Sistemas"] }
+];
+async function materiasHorario() { return SEMESTRES_H; }
 
 async function formHorario(ed) {
   const viejo = document.getElementById("formHor");
@@ -225,44 +232,68 @@ async function formHorario(ed) {
   hoja.appendChild(fTipo);
 
   hoja.appendChild(mk("label", "", "Materia"));
-  const sel = document.createElement("select");
-  sems.forEach(s => {
-    const g = document.createElement("optgroup");
-    g.label = s.sem;
-    s.mats.forEach(m => { const o = document.createElement("option"); o.value = m; o.textContent = m; g.appendChild(o); });
-    if (s.mats.length) sel.appendChild(g);
-  });
-  const oo = document.createElement("option");
-  oo.value = "__otra"; oo.textContent = "Otra (escribir nombre)…";
-  sel.appendChild(oo);
-  hoja.appendChild(sel);
+  const pick = mk("div", "hor-pick");
+  hoja.appendChild(pick);
+  const resto = mk("div");
+  hoja.appendChild(resto);
   const otra = document.createElement("input");
   otra.type = "text"; otra.placeholder = "Nombre de la materia"; otra.maxLength = 40;
-  otra.style.marginTop = "8px";
-  hoja.appendChild(otra);
-  const verOtra = () => { otra.style.display = sel.value === "__otra" ? "block" : "none"; };
-  if (ed) {
-    const existe = Array.prototype.some.call(sel.options, o => o.value === ed.nombre);
-    sel.value = existe ? ed.nombre : "__otra";
-    if (!existe) otra.value = ed.nombre;
-  }
-  verOtra();
-  if (!color) color = colorDe(sel.value === "__otra" ? "" : sel.value);
-  sel.onchange = () => { verOtra(); if (!ed && sel.value !== "__otra") { color = colorDe(sel.value); pintar(); } };
+  let nombre = ed ? ed.nombre : "";
+  let vista = ed ? "ok" : "sem";   /* sem = semestres, mats = materias del semestre, otra = escribir, ok = ya elegida */
+  let semAbierto = 0;
+  if (!color) color = colorDe(nombre);
 
-  hoja.appendChild(mk("label", "", "Nombre corto (opcional)"));
+  const item = (txt, cls, fn, der) => {
+    const b = mk("button", "hor-it" + (cls ? " " + cls : ""));
+    b.type = "button";
+    b.appendChild(mk("span", "", txt));
+    if (der) b.appendChild(mk("span", "", der));
+    b.onclick = fn;
+    return b;
+  };
+  const atras = (txt, fn) => { const b = mk("button", "hor-atras", txt); b.type = "button"; b.onclick = fn; return b; };
+  const elegir = (n) => {
+    nombre = n; vista = "ok";
+    if (!ed) color = colorDe(n);
+    pintarPick(); pintar();
+  };
+  function pintarPick() {
+    pick.innerHTML = "";
+    if (vista === "sem") {
+      sems.forEach((s, i) => {
+        if (s.mats.length) pick.appendChild(item(s.sem, "", () => { semAbierto = i; vista = "mats"; pintarPick(); }, "›"));
+      });
+      pick.appendChild(item("Otra materia (escribir nombre)", "otra", () => { vista = "otra"; pintarPick(); otra.focus(); }, "+"));
+    } else if (vista === "mats") {
+      pick.appendChild(atras("‹ Semestres", () => { vista = "sem"; pintarPick(); }));
+      pick.appendChild(mk("div", "hor-sem-tit", sems[semAbierto].sem));
+      sems[semAbierto].mats.forEach(m => pick.appendChild(item(m, m === nombre ? "on" : "", () => elegir(m), m === nombre ? "✓" : "")));
+    } else if (vista === "otra") {
+      pick.appendChild(atras("‹ Semestres", () => { vista = "sem"; pintarPick(); }));
+      pick.appendChild(otra);
+      pick.appendChild(item("Usar este nombre", "on fila", () => {
+        if (otra.value.trim()) elegir(otra.value.trim());
+        else err.textContent = "Escribe el nombre de la materia.";
+      }));
+    } else {
+      pick.appendChild(item(nombre, "on fila", () => { vista = "sem"; pintarPick(); }, "Cambiar"));
+    }
+    resto.style.display = vista === "ok" ? "block" : "none";
+  }
+
+  resto.appendChild(mk("label", "", "Nombre corto (opcional)"));
   const corto = document.createElement("input");
   corto.type = "text"; corto.maxLength = 14; corto.placeholder = "Ej: Op. Unitarias"; corto.value = ed ? (ed.corto || "") : "";
-  hoja.appendChild(corto);
+  resto.appendChild(corto);
 
   const zonaSes = mk("div");
-  hoja.appendChild(zonaSes);
+  resto.appendChild(zonaSes);
   const bMas = mk("button", "hor-mas", "+ Otro horario");
   bMas.type = "button";
   bMas.onclick = () => { ses.push({ dias: [], ini: PERIODOS[0][0], fin: PERIODOS[0][1], aula: "" }); pintarSes(); };
-  hoja.appendChild(bMas);
+  resto.appendChild(bMas);
 
-  hoja.appendChild(mk("label", "", "Color"));
+  resto.appendChild(mk("label", "", "Color"));
   const fCol = mk("div", "hor-colores");
   const bCols = COLORES_H.map(c => {
     const b = mk("button"); b.type = "button"; b.style.background = c; b.setAttribute("aria-label", "Color");
@@ -270,7 +301,7 @@ async function formHorario(ed) {
     fCol.appendChild(b);
     return b;
   });
-  hoja.appendChild(fCol);
+  resto.appendChild(fCol);
 
   const err = mk("div", "hor-err");
   hoja.appendChild(err);
@@ -353,8 +384,7 @@ async function formHorario(ed) {
   bA.onclick = () => { tipo = "a"; pintar(); pintarSes(); };
 
   bGu.onclick = () => {
-    const nombre = (sel.value === "__otra" ? otra.value : sel.value).trim();
-    if (!nombre) { err.textContent = "Escribe el nombre de la materia."; return; }
+    if (vista !== "ok" || !nombre.trim()) { err.textContent = "Elige una materia."; return; }
     for (let i = 0; i < ses.length; i++) {
       const s = ses[i], q = ses.length > 1 ? " (horario " + (i + 1) + ")" : "";
       if (!s.dias.length) { err.textContent = "Marca al menos un día" + q + "."; return; }
@@ -363,7 +393,7 @@ async function formHorario(ed) {
     }
     const reg = {
       id: ed ? ed.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
-      tipo: tipo, nombre: nombre, corto: corto.value.trim(), color: color,
+      tipo: tipo, nombre: nombre.trim(), corto: corto.value.trim(), color: color,
       sesiones: ses.map(s => ({ dias: s.dias.slice().sort(), ini: s.ini, fin: s.fin, aula: (s.aula || "").trim() }))
     };
     const l = leerHor().filter(x => x.id !== reg.id);
@@ -375,5 +405,16 @@ async function formHorario(ed) {
 
   pintar();
   pintarSes();
+  pintarPick();
   document.body.appendChild(fondo);
 }
+
+/* al girar el teléfono o cambiar el tamaño de la ventana, el horario se vuelve a acomodar */
+window.addEventListener("resize", () => {
+  clearTimeout(_ht);
+  _ht = setTimeout(() => {
+    if (!document.querySelector(".hg") || document.getElementById("formHor")) return;
+    if (window.innerWidth === _hw) return; /* solo cambió el alto (barra del navegador o teclado) */
+    dibujarHorario();
+  }, 200);
+});
