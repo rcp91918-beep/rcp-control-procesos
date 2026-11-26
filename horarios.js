@@ -189,17 +189,16 @@ function dibujarHorario() {
 
 /* materias por semestre, con nombres cortos (lista fija) */
 const SEMESTRES_H = [
-  { sem: "Semestre 1", mats: ["Física 1", "Álgebra 1", "Cálculo 1", "Dibujo Técnico", "Química General"] },
-  { sem: "Semestre 2", mats: ["Física 2", "Metodología 1", "Cálculo 2", "Álgebra 2", "Inorgánica"] },
-  { sem: "Semestre 3", mats: ["Orgánica 1", "Física 3", "Informática 1", "Ecuaciones", "Analítica"] },
-  { sem: "Semestre 4", mats: ["Orgánica 2", "Físico-Química", "Agua", "Microbiología", "OPE-1"] },
-  { sem: "Semestre 5", mats: ["Estadística", "Metodología 2", "Numérico", "Termodinámica", "Instrumental"] },
-  { sem: "Semestre 6", mats: ["Aplicada", "OPE-2", "Tecno", "Calidad", "Azúcar"] },
-  { sem: "Semestre 7", mats: ["Lácteos", "Aceite", "Instrumentación 1", "Gestión", "Higiene"] },
-  { sem: "Semestre 8", mats: ["Separación", "Analógicos", "Electrotecnia", "Análisis de Sistemas", "Economía"] },
-  { sem: "Semestre 9", mats: ["Inglés", "Hidrocarburos", "Cemento", "Reacciones", "Instrumentación 2"] },
-  { sem: "Semestre 10", mats: ["PLC", "Proyectos", "Maderas", "Sustancias", "Planificación"] },
-  { sem: "Semestre 11", mats: ["Legislación", "Scada", "Producción", "Investigación en Control", "Gas y Petróleo", "Diseño de Sistemas"] }
+  { sem: "Semestre 1", mats: ["Química General", "Física 1", "Álgebra 1", "Cálculo 1", "Dibujo Técnico"] },
+  { sem: "Semestre 2", mats: ["Orgánica 1", "Inorgánica", "Física 2", "Álgebra 2", "Cálculo 2", "Metodología 1"] },
+  { sem: "Semestre 3", mats: ["Físico-Química", "Orgánica 2", "Analítica", "Física 3", "Ecuaciones", "Informática 1"] },
+  { sem: "Semestre 4", mats: ["Agua", "Microbiología", "Metodología 2", "OPE-1", "Numérico", "Estadística"] },
+  { sem: "Semestre 5", mats: ["Termodinámica", "Instrumental", "Aplicada", "OPE-2", "Tecno", "Calidad"] },
+  { sem: "Semestre 6", mats: ["Azúcar", "Lácteos", "Aceite", "Instrumentación 1", "Gestión", "Higiene"] },
+  { sem: "Semestre 7", mats: ["Inglés", "Separación", "Analógicos", "Electrotecnia", "Análisis de Sistemas", "Economía"] },
+  { sem: "Semestre 8", mats: ["Hidrocarburos", "Cemento", "Reacciones", "Instrumentación 2", "PLC", "Proyectos"] },
+  { sem: "Semestre 9", mats: ["Scada", "Maderas", "Sustancias", "Planificación", "Legislación", "Producción"] },
+  { sem: "Semestre 10", mats: ["Investigación en Control", "Gas y Petróleo", "Diseño de Sistemas"] }
 ];
 async function materiasHorario() { return SEMESTRES_H; }
 
