@@ -24,6 +24,7 @@ const IC = {
   der: "M9 5l7 7-7 7",
   abajo: "M5 9l7 7 7-7",
   arriba: "M5 15l7-7 7 7",
+  calendario: "M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 10h16M8 3v3M16 3v3",
   externo: "M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
 };
 const svgIcono = (d) => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '"/></svg>';
@@ -238,6 +239,9 @@ function armarMenu() {
     itemMenu(lista, { texto: a.name, icono: IC.archivo, onclick: () => { cerrarMenu(); abrirVisor(a, raiz.files); } });
   });
 
+  tituloMenu(lista, "Para ti");
+  itemMenu(lista, { texto: "Mis horarios", icono: IC.calendario, onclick: abrirHorarios });
+
   /* enlaces externos: se abren en otra pestaña y el menú queda abierto, así al volver estás en el menú */
   const externo = (texto, icono, url) => itemMenu(lista, { texto: texto, icono: icono, trail: IC.externo, onclick: () => window.open(url, "_blank", "noopener") });
 
@@ -287,7 +291,7 @@ function armarMenu() {
   pie.appendChild(compartir);
   const ver = document.createElement("div");
   ver.className = "menu-ver";
-  ver.textContent = "RCP · versión v3";
+  ver.textContent = "RCP · versión v3.2";
   pie.appendChild(ver);
 }
 
@@ -336,6 +340,7 @@ const rutaTexto = (ruta) => ruta.slice(1).map(p => p.name.trim()).join(" › ");
 function mostrarFavoritos() {
   favBase = 0;
   enInicio = false;
+  document.body.classList.remove("inicio");
   origenMenu = false;
   camino = [{ id: raiz.id, name: raiz.name }, { id: "fav", name: "Favoritos" }];
   actual = null;
@@ -396,6 +401,7 @@ function mostrarFavoritos() {
 
 async function abrir(id, nombre, nivel) {
   if (id === "fav") { mostrarFavoritos(); return; }
+  if (id === "hor") { mostrarHorarios(); return; }
   const cont = document.getElementById("contenido");
   document.getElementById("buscador").value = "";
   cont.innerHTML = '<p class="msg">Cargando...</p>';
@@ -428,6 +434,7 @@ const COLORES_ANIO = ["#123b8f", "#0f6b6b", "#5b3fa8", "#b4570a", "#0b2559"];
 function dibujarSemestres(cont, carpetas) {
   let actualId = null;
   try { actualId = localStorage.getItem(ACTUAL_KEY); } catch (e) {}
+  cont.appendChild(crearPestanas(0));
   const g = document.createElement("div");
   g.className = "sem-grid";
   const bf = document.createElement("button");
@@ -472,6 +479,7 @@ function dibujar(d, filtro) {
   const archivos = d.files.filter(x => x.name.toLowerCase().includes(f));
 
   document.getElementById("titulo").innerText = d.name.trim();
+  document.body.classList.toggle("inicio", enInicio);
   document.getElementById("navFila").style.display = enInicio ? "none" : "flex";
   document.getElementById("buscador").style.display = enInicio ? "none" : "block";
   if (!enInicio) {

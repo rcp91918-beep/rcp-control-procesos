@@ -1,5 +1,5 @@
-const CACHE = "rcp-v3";
-const ARCHIVOS = ["./", "index.html", "estilos.css", "api.js", "videos.js", "app.js", "instalar.js", "portada.js", "portada.jpg", "logo.png", "manifest.json"];
+const CACHE = "rcp-v3.2";
+const ARCHIVOS = ["./", "index.html", "estilos.css", "api.js", "videos.js", "app.js", "horarios.js", "instalar.js", "portada.js", "portada.jpg", "logo.png", "manifest.json"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARCHIVOS)).then(() => self.skipWaiting()));

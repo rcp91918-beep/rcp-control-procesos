@@ -161,7 +161,46 @@ footer { margin-top: 50px; padding: 22px; text-align: center; background: var(--
 .ai-instalar:hover { background: var(--rojo); }
 .ai-x { width: 40px; height: 40px; border: none; background: transparent; color: #5b6b8c; font-size: 26px; line-height: 1; flex-shrink: 0; cursor: pointer; }
 
+/* MIS HORARIOS */
+.hor-vacio { text-align: center; color: #5b6b8c; padding: 18px 8px; font-size: 15px; }
+.hor-grid { margin: 0 -10px; display: grid; grid-template-columns: 32px repeat(6, 1fr); font-size: 11px; color: #5b6b8c; }
+.hor-dia { text-align: center; font-weight: 700; color: var(--azul-oscuro); padding-bottom: 6px; font-size: 12px; }
+.hor-horas { position: relative; }
+.hor-horas span { position: absolute; right: 4px; font-size: 10px; transform: translateY(-6px); }
+.hor-col { position: relative; border-left: 1px solid #e5e9f2; }
+.hor-linea { position: absolute; left: 0; right: 0; border-top: 1px solid #e9edf5; }
+.hor-bloque { position: absolute; border: 0; border-radius: 6px; color: white; padding: 3px 3px; font-family: inherit; font-size: 9.5px; line-height: 1.15; text-align: left; overflow: hidden; cursor: pointer; word-break: break-word; }
+.hor-bloque b { display: block; font-weight: 700; }
+.hor-bloque i { display: block; font-style: normal; opacity: .92; }
+.hor-bloque.aux { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.22) 0 5px, transparent 5px 10px); outline: 2px dashed rgba(255,255,255,.75); outline-offset: -3px; }
+.hor-btn { display: block; width: 100%; margin-top: 14px; height: 48px; border: none; border-radius: 14px; background: var(--rojo); color: white; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+.hor-nota { text-align: center; color: #5b6b8c; font-size: 12px; margin-top: 10px; }
+#formHor { position: fixed; inset: 0; z-index: 200; background: rgba(11,37,89,.55); display: flex; align-items: flex-end; justify-content: center; }
+#formHor .hoja { background: white; width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto; border-radius: 22px 22px 0 0; padding: 18px 18px 22px; }
+#formHor h3 { text-transform: none; letter-spacing: 0; font-family: 'Bricolage Grotesque', Arial, sans-serif; color: var(--azul-oscuro); font-size: 22px; margin-bottom: 4px; }
+#formHor label { display: block; font-size: 12px; font-weight: 700; color: #5b6b8c; margin: 14px 0 5px; text-transform: uppercase; }
+#formHor select, #formHor input[type=text], #formHor input[type=time] { width: 100%; height: 46px; padding: 0 12px; border: 2px solid #d5dcea; border-radius: 12px; background: white; font-family: inherit; font-size: 16px; color: var(--azul-oscuro); }
+#formHor select:focus, #formHor input:focus { outline: none; border-color: var(--azul); }
+.hor-par { display: flex; gap: 10px; } .hor-par > div { flex: 1; min-width: 0; }
+.hor-tipo, .hor-dias { display: flex; gap: 6px; }
+.hor-tipo button, .hor-dias button { flex: 1; height: 44px; border: 2px solid #d5dcea; border-radius: 12px; background: white; font-family: inherit; font-size: 15px; font-weight: 600; color: var(--azul-oscuro); cursor: pointer; }
+.hor-tipo button.on, .hor-dias button.on { background: var(--azul); border-color: var(--azul); color: white; }
+.hor-colores { display: flex; gap: 8px; flex-wrap: wrap; }
+.hor-colores button { width: 36px; height: 36px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px #d5dcea; cursor: pointer; }
+.hor-colores button.on { box-shadow: 0 0 0 3px var(--rojo); }
+.hor-acc { display: flex; gap: 10px; margin-top: 20px; }
+.hor-acc button { flex: 1; height: 48px; border: none; border-radius: 14px; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; background: #e6edfb; color: var(--azul-oscuro); }
+.hor-acc .gu { background: var(--azul); color: white; }
+.hor-acc .el { background: #fde8e9; color: var(--rojo-oscuro); }
+.hor-err { color: var(--rojo-oscuro); font-size: 13px; font-weight: 600; margin-top: 10px; min-height: 16px; }
+
 /* PORTADA (imagen al entrar) */
 #portada { position: fixed; inset: 0; z-index: 300; background: #fff; display: flex; align-items: center; justify-content: center; }
 #portada img { max-width: 94vw; max-height: 86vh; width: auto; height: auto; object-fit: contain; }
 #portadaX { position: absolute; top: 14px; right: 14px; width: 44px; height: 44px; border: none; border-radius: 50%; background: var(--azul-oscuro); color: white; font-size: 30px; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+
+/* PESTAÑAS DE INICIO */
+body.inicio #titulo { display: none; }
+.pestanas { display: flex; gap: 5px; background: #e3e9f6; border-radius: 16px; padding: 5px; margin-bottom: 14px; }
+.pestanas button { flex: 1; height: 46px; border: none; border-radius: 12px; background: transparent; color: var(--azul); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.pestanas button.on { background: var(--azul); color: white; box-shadow: 0 2px 6px rgba(18,59,143,.3); }
