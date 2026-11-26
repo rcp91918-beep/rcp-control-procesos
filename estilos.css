@@ -224,3 +224,11 @@ body.inicio #titulo { display: none; }
   #formHor .hoja { border-radius: 22px; max-height: 88vh; max-height: 88dvh; padding-bottom: 22px; }
   .hor-btn { max-width: 360px; }
 }
+
+/* celulares: cuando se ve la grilla del horario, se aprovecha casi todo el ancho de la pantalla */
+@media (max-width: 600px) {
+  .contenedor:has(.hg) { margin-top: 12px; padding: 0 4px; }
+  .contenedor:has(.hg) .nav-fila { padding: 0 8px; }
+  .seccion:has(.hg) { padding: 14px 4px 16px; border-radius: 14px; }
+  .hg { margin: 0; }
+}
